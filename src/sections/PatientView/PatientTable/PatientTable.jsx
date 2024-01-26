@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { getAllDoctors, setDoctorsAvailable, setSelectedDoctor, updateOperationsCalendar } from '../../../redux/features/doctor/doctorSlice';
+import { getAllDoctors } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 
 const PatientTable = () => {
@@ -82,20 +82,10 @@ const PatientTable = () => {
     }, []);
 
 
-    console.log(operationSlots)
 
-
-    const handleUpdateSlot = () => {
-
-    };
-
-
-
-    function handleSubmit() {
-
-
-    }
-
+function handleUpload(item){
+    alert(`Your appointment has been booked on ${item.day} (${item.date}) at ${item.timestamp}`)
+}
 
 
     const currentDayIndex = 0;
@@ -186,8 +176,8 @@ const PatientTable = () => {
                                     <React.Fragment key={idx}>
                                         {selectedPeriod ? element.users
                                             .filter((user) => user.period === selectedPeriod)
-                                            .map((_, userIndex) => (
-                                                <span
+                                            .map((ele, userIndex) => (
+                                                <span onClick={()=>handleUpload(element)}
                                                     key={userIndex}
                                                     className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
                                                         } bg-[#FFFFFF80] `}
@@ -196,8 +186,8 @@ const PatientTable = () => {
                                                 </span>
                                             ))
                                             :
-                                            element.users.map((_, userIndex) => (
-                                                <span
+                                            element.users.map((ele, userIndex) => (
+                                                <span onClick={()=>handleUpload(element)}
                                                     key={userIndex}
                                                     className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
                                                         } bg-[#FFFFFF80] `}
@@ -216,10 +206,9 @@ const PatientTable = () => {
 
             <div className='border-t-[1px] border-[#FFFFFF80] border-solid w-full mt-10 mb-5'></div>
             <button
-                onClick={handleSubmit}
                 className='bg-[#081c1f] px-10 py-2 text-white  rounded-md shadow-sm shadow-[#00acc1] font-light'
             >
-                SAVE
+                SUBMIT
             </button>
         </section>
     );

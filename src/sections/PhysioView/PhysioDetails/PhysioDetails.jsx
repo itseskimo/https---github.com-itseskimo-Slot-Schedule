@@ -1,59 +1,11 @@
-import { setSelectedDoctor, setRemarks, setDoctorsAppointment } from '../../../redux/features/doctor/doctorSlice';
-import { useSelector, useDispatch } from 'react-redux';
-import { useState, useRef } from 'react';
+import { useSelector } from 'react-redux';
 
-const PatientDetails = () => {
+const PhysioDetails = () => {
 
-    const dispatch = useDispatch();
-    const { availableDoctors, selectedDoctor, doctorsList } = useSelector((state) => state.doctor);
-
-    const [email, setEmail] = useState('')
-    const [isRemarksVisible, setisRemarksVisible] = useState('')
-    const inputRef = useRef(null)
+    const { doctorsList } = useSelector((state) => state.doctor);
 
 
-
-
-
-    const selectDoctor = (doc) => {
-        dispatch(setSelectedDoctor(doc))
-
-        // Find the doctor with matching day, date, and timestamp
-        const updatedDoctorList = doctorsList?.map((doctor) => {
-            const updatedCalendars = doctor.calendars.map((calendar) => {
-                if (
-                    calendar.day === availableDoctors.day &&
-                    calendar.date === availableDoctors.date &&
-                    calendar.selectedSlots.some(
-                        (slot) => slot.timestamp === availableDoctors.timestamp
-                    )
-                ) {
-                    const updatedSlots = calendar.selectedSlots.map((slot) => {
-
-
-
-                        const userEntry = {
-                            timestamp: availableDoctors.timestamp,
-                            period: slot.period,
-                            assignedDoctor: doc,
-                            users: availableDoctors.users.map((user) => user.userId === doctor.name ? { userId: user.userId, remarks: inputRef.current.value } : user)
-                        };
-
-                        return slot.timestamp === availableDoctors.timestamp ? userEntry : slot
-                    });
-
-                    return { ...calendar, selectedSlots: updatedSlots };
-                }
-                return calendar;
-            });
-
-            return { ...doctor, calendars: updatedCalendars };
-        });
-
-        // Update the state with the modified doctorData
-        dispatch(setDoctorsAppointment(updatedDoctorList))
-    };
-
+  
 
 
     return (
@@ -64,35 +16,31 @@ const PatientDetails = () => {
             </div>
 
 
-
-            <div className='flex items-center relative w-full overflow-hidden my-6'>
-                <div className="bg-[#081c1f] py-2 text-white rounded-md flex items-center absolute right-0 cursor-pointer h-full text-center px-4 rounded-r-[6px]  text-[16px]">
-                    <span className="">Submit</span>
-                </div>
-                <input ref={inputRef} value={email} onChange={(e) => [setEmail(e.target.value), dispatch(setRemarks(e.target.value))]} className=' outline-none rounded-[6px] py-[6px] text-[12px] md:text-[16px] md:py-[10px] pl-4 pr-10 w-full text-[#4C5864]  placeholder:text-[12px] md:placeholder:text-[14px] placeholder:text-[#4C5864]' placeholder='Remarks...' type="email" />
-            </div>
+           
 
 
 
-
-            <section className='py-4'>
-                <h6>List of Available Doctors:</h6>
-                <ul className='flex items-center flex-wrap py-2 gap-5'>
-
-                    {Object.keys(availableDoctors || [])?.length === 0 && <li>Sorry, No Doctors Currently Available!</li>}
-                    {availableDoctors?.users?.map((doc, i) => (
-                        <li
-                            style={{ background: selectedDoctor === doc.userId && 'linear-gradient(90deg, rgba(6,15,23,1) 0%, rgba(4,65,78,1) 24%, rgba(3,86,101,1) 46%, rgba(2,109,126,1) 56%, rgba(144,238,144,1) 100%)' }}
-                            key={i} onClick={() => [selectDoctor(doc.userId), setisRemarksVisible(doc.remarks)]} className={` px-8 py-2 whitespace-nowrap rounded-md text-center relative bg-transparent shadow-sm shadow-green-400 cursor-pointer`}>{doc.userId}</li>
-                    ))}
-                </ul>
-
-            </section>
-
-            {isRemarksVisible && <p>REMARKS: {isRemarksVisible}</p>}
-
+            {/* <div className='flex items-center gap-4'>
+                <svg className='h-7 w-7' viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" >
+                    <defs>
+                        <style>{".cls-1{fill:#FFFFFF80;}"}</style>
+                    </defs>
+                    <title />
+                    <g data-name="Layer 11" id="Layer_11">
+                        <path
+                            className="cls-1"
+                            d="M16,5A11,11,0,1,0,27,16,11,11,0,0,0,16,5Zm0,20a9,9,0,1,1,9-9A9,9,0,0,1,16,25Z"
+                        />
+                        <polygon
+                            className="cls-1"
+                            points="15 15 9.33 15 9.33 17 17 17 17 8.83 15 8.83 15 15"
+                        />
+                    </g>
+                </svg>
+                <p className='font-semibold'>45 min</p>
+            </div> */}
 
         </section>)
 }
 
-export default PatientDetails
+export default PhysioDetails

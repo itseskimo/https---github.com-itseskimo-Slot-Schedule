@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { addPhysioCalendar, getPhysioCalendar } from '../../redux/features/doctor/doctorSlice';
+import { addPhysioCalendar, getPhysioCalendar } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 
-const AppointmentTable = () => {
+const PhysioTable = () => {
 
     const dispatch = useDispatch();
     const { bookedSlots ,selectedRemarks} = useSelector((state) => state.doctor);
@@ -178,6 +178,6 @@ console.log(selectedDates)
     );
 };
 
-export default AppointmentTable;
+export default PhysioTable;
 
 
