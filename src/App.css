@@ -1,0 +1,80 @@
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.form-bg {
+  background: linear-gradient(to top, transparent, transparent, #6E56F840, #6E56F840);
+}
+
+.submitBtn {
+  position: relative;
+  cursor: pointer;
+  padding: 10px 36px;
+  background-color: #0e0423;
+  border: 1px solid #808080;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.submitBtn::before {
+  content: '';
+  position: absolute;
+  background-image: conic-gradient(transparent, transparent, transparent, white, transparent, transparent, transparent);
+  width: 800px;
+  height: 800px;
+  animation: animate 4s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes animate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+.submitBtn span {
+  position: absolute;
+  background-color: #0e0423;
+  inset: 1px;
+  border-radius: 20px;
+  z-index: 1;
+  pointer-events: none;
+
+}
+
+.submitBtn h6 {
+  font-size: 18px;
+  font-weight: 100;
+  z-index: 2;
+  pointer-events: none;
+  color: white;
+}
+
+.submitBtnOverlay {
+  position: absolute;
+  background: linear-gradient(180deg, transparent 33.21%, #261d34 100%);
+  transition: all 1s ease-in;
+  border-radius: 20px;
+  z-index: 2;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.submitBtnOverlay:hover {
+  opacity: 1;
+}
+
+
