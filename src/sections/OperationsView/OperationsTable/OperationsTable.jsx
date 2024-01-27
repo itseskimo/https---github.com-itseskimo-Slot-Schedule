@@ -135,7 +135,6 @@ const OperationsTable = () => {
 
 
 
-    const currentDayIndex = 0;
 
     const generateTimeSlots = () => {
         const startTime = new Date('2024-01-01T09:00:00');
@@ -167,6 +166,8 @@ const OperationsTable = () => {
         return timeSlots;
     };
 
+    const currentDayIndex = new Date().getDay();
+
     const getFormattedDate = (offset) => {
         const today = new Date();
         const targetDate = new Date(today);
@@ -178,14 +179,30 @@ const OperationsTable = () => {
         return `${month} ${date}`;
     };
 
-    const calendarController = [
+    let calendarController = [
         { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
         { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
         { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
         { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
         { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
         { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
-    ].filter((_, index) => index >= currentDayIndex || currentDayIndex === 0);
+        { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
+    ];
+
+    // Include the entire week starting from Monday if it's Sunday
+    if (currentDayIndex === 0) {
+        calendarController = [
+            { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
+            { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
+            { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
+            { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
+            { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
+            { day: 'Saturday', date: getFormattedDate(7), slots: generateTimeSlots() }
+        ]
+    } else {
+        // Filter days before the current day
+        calendarController = calendarController.filter((_, index) => index >= currentDayIndex);
+    }
 
 
     const [selectedPeriod, setSelectedPeriod] = useState(''); // Initial state is an empty string
