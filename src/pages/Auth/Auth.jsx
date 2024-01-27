@@ -57,18 +57,18 @@ const Auth = () => {
             }
         }
 
-        if(localStorage.getItem('userInfo')){
-            let data = localStorage.getItem('userInfo')
-            let loginData = JSON.parse(data);
+        // if(localStorage.getItem('userInfo')){
+        //     let data = localStorage.getItem('userInfo')
+        //     let loginData = JSON.parse(data);
         
-            if (loginData?.role === 'Physio') {
-                navigate('/physio')
-            } else if (loginData?.role === 'Operations') {
-                navigate('/operations')
-            } else if (loginData?.role === 'Patient') {
-                navigate('/patient')
-            }
-          }
+        //     if (loginData?.role === 'Physio') {
+        //         navigate('/physio')
+        //     } else if (loginData?.role === 'Operations') {
+        //         navigate('/operations')
+        //     } else if (loginData?.role === 'Patient') {
+        //         navigate('/patient')
+        //     }
+        //   }
     }, [userInfo])
 
 
