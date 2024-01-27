@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { addPhysioCalendar, getPhysioCalendar } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const PhysioTable = () => {
 
     const dispatch = useDispatch();
-    const { bookedSlots ,selectedRemarks} = useSelector((state) => state.doctor);
+    const { bookedSlots, selectedRemarks } = useSelector((state) => state.doctor);
     const [selectedDates, setSelectedDates] = useState([]);
     const [clientId, setClientId] = useState('');
     const [token, setToken] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (localStorage.getItem("userInfo")) {
@@ -22,7 +24,7 @@ const PhysioTable = () => {
         }
     }, []);
 
-console.log(selectedDates)
+
 
 
     useEffect(() => {
@@ -74,7 +76,7 @@ console.log(selectedDates)
         });
     }
 
-    const currentDayIndex = 0;
+
 
     const generateTimeSlots = () => {
         const startTime = new Date('2024-01-01T09:00:00');
@@ -106,6 +108,10 @@ console.log(selectedDates)
         return timeSlots;
     };
 
+
+
+    const currentDayIndex = new Date().getDay();
+
     const getFormattedDate = (offset) => {
         const today = new Date();
         const targetDate = new Date(today);
@@ -117,21 +123,43 @@ console.log(selectedDates)
         return `${month} ${date}`;
     };
 
-    const calendarController = [
+    let calendarController = [
         { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
         { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
         { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
         { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
         { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
         { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
-    ].filter((_, index) => index >= currentDayIndex || currentDayIndex === 0);
+        { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
+    ];
 
-    
+    // Include the entire week starting from Monday if it's Sunday
+    if (currentDayIndex === 0) {
+        calendarController = [
+            { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
+            { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
+            { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
+            { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
+            { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
+            { day: 'Saturday', date: getFormattedDate(7), slots: generateTimeSlots() }
+        ]
+    } else {
+        // Filter days before the current day
+        calendarController = calendarController.filter((_, index) => index >= currentDayIndex);
+    }
+
+    // Now, calendarController contains the desired calendar information
+
+
+    console.log(currentDayIndex)
 
     return (
         <section className='flex flex-col items-start p-6'>
-            <div className='mb-5 flex items-center justify-between'>
-                <span className=' text-white text-xl'>Hello {clientId}</span>
+            <div className='mb-5 flex items-center gap-6 justify-between  w-full'>
+
+                    <span className=' text-white text-xl'>Hello {clientId}</span>
+                    
+                <span onClick={() => [localStorage.clear('userInfo'), navigate('/')]} className='text-white'>Logout</span>
             </div>
             <div className='border-t-[1px] border-[#FFFFFF80] border-solid w-full mb-6'></div>
             <div className='grid grid-cols-6 gap-8'>
@@ -152,13 +180,11 @@ console.log(selectedDates)
                                 <span
                                     key={idx}
                                     onClick={() => handleClick(item.day, item.date, element)}
-                                    className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative  ${
-                                        currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
-                                    } ${
-                                        isSelected
+                                    className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative  ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
+                                        } ${isSelected
                                             ? 'bg-[#00acc1] ' // Color for selected slots
                                             : 'bg-[#FFFFFF80] ' // Default color
-                                    }`}
+                                        }`}
                                 >
                                     {element.timestamp}
                                 </span>

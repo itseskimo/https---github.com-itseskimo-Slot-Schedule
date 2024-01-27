@@ -2,6 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { getAllDoctors } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const PatientTable = () => {
 
@@ -9,6 +10,7 @@ const PatientTable = () => {
     const { doctorsList } = useSelector((state) => state.doctor);
     const [clientId, setClientId] = useState('');
     const [operationSlots, setOperationSlots] = useState([]);
+    const navigate = useNavigate();
 
 
 
@@ -83,9 +85,9 @@ const PatientTable = () => {
 
 
 
-function handleUpload(item){
-    alert(`Your appointment has been booked on ${item.day} (${item.date}) at ${item.timestamp}`)
-}
+    function handleUpload(item) {
+        alert(`Your appointment has been booked on ${item.day} (${item.date}) at ${item.timestamp}`)
+    }
 
 
     const currentDayIndex = 0;
@@ -149,14 +151,18 @@ function handleUpload(item){
     };
     return (
         <section className='flex flex-col items-start p-6'>
-            <div className='mb-5 flex items-center gap-6'>
-                <span className=' text-white text-xl'>Hello {clientId}</span>
-                <select className='px-8 py-[6px] outline-none' value={selectedPeriod} onChange={handlePeriodChange}>
-                    <option className='py-1' value=''>Select a Period</option>
-                    <option className='py-1' value='morning'>Morning</option>
-                    <option className='py-1' value='afternoon'>Afternoon</option>
-                    <option className='py-1' value='evening'>Evening</option>
-                </select>
+            <div className='mb-5 flex items-center gap-6 justify-between  w-full'>
+
+                <div className=' flex items-center gap-6'>
+                    <span className=' text-white text-xl'>Hello {clientId}</span>
+                    <select className='px-8 py-[6px] outline-none' value={selectedPeriod} onChange={handlePeriodChange}>
+                        <option className='py-1' value=''>Select a Period</option>
+                        <option className='py-1' value='morning'>Morning</option>
+                        <option className='py-1' value='afternoon'>Afternoon</option>
+                        <option className='py-1' value='evening'>Evening</option>
+                    </select>
+                </div>
+                <span onClick={()=>[localStorage.clear('userInfo'), navigate('/')]} className='text-white'>Logout</span>
             </div>
             <div className='border-t-[1px] border-[#FFFFFF80] border-solid w-full mb-6'></div>
             <div className='grid grid-cols-6 gap-8'>
@@ -177,7 +183,7 @@ function handleUpload(item){
                                         {selectedPeriod ? element.users
                                             .filter((user) => user.period === selectedPeriod)
                                             .map((ele, userIndex) => (
-                                                <span onClick={()=>handleUpload(element)}
+                                                <span onClick={() => handleUpload(element)}
                                                     key={userIndex}
                                                     className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
                                                         } bg-[#FFFFFF80] `}
@@ -187,7 +193,7 @@ function handleUpload(item){
                                             ))
                                             :
                                             element.users.map((ele, userIndex) => (
-                                                <span onClick={()=>handleUpload(element)}
+                                                <span onClick={() => handleUpload(element)}
                                                     key={userIndex}
                                                     className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
                                                         } bg-[#FFFFFF80] `}

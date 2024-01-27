@@ -1,4 +1,4 @@
-
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getAllDoctors, setDoctorsAvailable, setSelectedDoctor, updateOperationsCalendar } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,6 +9,7 @@ const OperationsTable = () => {
     const { doctorsList, doctorsData, availableDoctors, selectedDoctor, selectedRemarks } = useSelector((state) => state.doctor);
     const [clientId, setClientId] = useState('');
     const [operationSlots, setOperationSlots] = useState([]);
+    const navigate = useNavigate();
 
 
 
@@ -195,15 +196,19 @@ const OperationsTable = () => {
     };
     return (
         <section className='flex flex-col items-start p-6'>
-            <div className='mb-5 flex items-center gap-6'>
-                <span className=' text-white text-xl'>Hello {clientId}</span>
-                <select className='px-8 py-[6px] outline-none' value={selectedPeriod} onChange={handlePeriodChange}>
-                    <option className='py-1' value=''>Select a Period</option>
-                    <option className='py-1' value='morning'>Morning</option>
-                    <option className='py-1' value='afternoon'>Afternoon</option>
-                    <option className='py-1' value='evening'>Evening</option>
-                </select>
-            </div>
+             <div className='mb-5 flex items-center gap-6 justify-between  w-full'>
+
+<div className=' flex items-center gap-6'>
+    <span className=' text-white text-xl'>Hello {clientId}</span>
+    <select className='px-8 py-[6px] outline-none' value={selectedPeriod} onChange={handlePeriodChange}>
+        <option className='py-1' value=''>Select a Period</option>
+        <option className='py-1' value='morning'>Morning</option>
+        <option className='py-1' value='afternoon'>Afternoon</option>
+        <option className='py-1' value='evening'>Evening</option>
+    </select>
+</div>
+<span onClick={()=>[localStorage.clear('userInfo'), navigate('/')]} className='text-white'>Logout</span>
+</div>
             <div className='border-t-[1px] border-[#FFFFFF80] border-solid w-full mb-6'></div>
             <div className='grid grid-cols-6 gap-8'>
   {calendarController.map((item, index) => {

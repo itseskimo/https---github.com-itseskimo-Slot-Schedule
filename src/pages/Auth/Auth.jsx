@@ -33,6 +33,8 @@ const Auth = () => {
 
         if (formData.username && formData.password && role && formToggler) {
             dispatch(register({ username: formData.username, password: formData.password, role }))
+            alert('Register Successful. Please Login')
+            setFormToggler(false)
         }
         if (formData.username && formData.password && !formToggler) {
             dispatch(login({ username: formData.username, password: formData.password }))
@@ -54,6 +56,19 @@ const Auth = () => {
                 navigate('/patient')
             }
         }
+
+        if(localStorage.getItem('userInfo')){
+            let data = localStorage.getItem('userInfo')
+            let loginData = JSON.parse(data);
+        
+            if (loginData?.role === 'Physio') {
+                navigate('/physio')
+            } else if (loginData?.role === 'Operations') {
+                navigate('/operations')
+            } else if (loginData?.role === 'Patient') {
+                navigate('/patient')
+            }
+          }
     }, [userInfo])
 
 

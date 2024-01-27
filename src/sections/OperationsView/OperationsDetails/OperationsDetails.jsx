@@ -35,7 +35,7 @@ const OperationsDetails = () => {
                             timestamp: availableDoctors.timestamp,
                             period: slot.period,
                             assignedDoctor: doc,
-                            users: availableDoctors.users.map((user) => user.userId === doctor.name ? { userId: user.userId, remarks: inputRef.current.value } : user)
+                            users: availableDoctors.users.map((user) => user.userId === doctor.name ? { userId: user.userId, remarks: inputRef.current.value || ''  } : user)
                         };
 
                         return slot.timestamp === availableDoctors.timestamp ? userEntry : slot
@@ -64,11 +64,9 @@ const OperationsDetails = () => {
 
 
 
-            <div className='flex items-center relative w-full overflow-hidden my-6'>
-                <div className="bg-[#081c1f] py-2 text-white rounded-md flex items-center absolute right-0 cursor-pointer h-full text-center px-4 rounded-r-[6px]  text-[16px]">
-                    <span className="">Submit</span>
-                </div>
-                <input ref={inputRef} value={email} onChange={(e) => [setEmail(e.target.value), dispatch(setRemarks(e.target.value))]} className=' outline-none rounded-[6px] py-[6px] text-[12px] md:text-[16px] md:py-[10px] pl-4 pr-10 w-full text-[#4C5864]  placeholder:text-[12px] md:placeholder:text-[14px] placeholder:text-[#4C5864]' placeholder='Remarks...' type="email" />
+            <div className='flex flex-col gap-2 my-6'>
+               <label>Enter Remarks:</label>
+                <input ref={inputRef} value={email} onChange={(e) => [setEmail(e.target.value), dispatch(setRemarks(e.target.value))]} className=' outline-none rounded-[6px] py-[6px] text-[12px] md:text-[16px] md:py-[10px] px-4 w-full text-[#4C5864]  placeholder:text-[12px] md:placeholder:text-[14px] placeholder:text-[#4C5864]' placeholder='Remarks...' type="email" />
             </div>
 
 
