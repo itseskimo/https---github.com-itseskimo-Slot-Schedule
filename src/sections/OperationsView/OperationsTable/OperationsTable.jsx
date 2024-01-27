@@ -196,69 +196,69 @@ const OperationsTable = () => {
     };
     return (
         <section className='flex flex-col items-start p-6'>
-             <div className='mb-5 flex items-center gap-6 justify-between  w-full'>
+            <div className='mb-5 hidden md:flex items-center gap-6 justify-between  w-full '>
 
-<div className=' flex items-center gap-6'>
-    <span className=' text-white text-xl'>Hello {clientId}</span>
-    <select className='px-8 py-[6px] outline-none' value={selectedPeriod} onChange={handlePeriodChange}>
-        <option className='py-1' value=''>Select a Period</option>
-        <option className='py-1' value='morning'>Morning</option>
-        <option className='py-1' value='afternoon'>Afternoon</option>
-        <option className='py-1' value='evening'>Evening</option>
-    </select>
-</div>
-<span onClick={()=>[localStorage.clear('userInfo'), navigate('/')]} className='text-white'>Logout</span>
-</div>
+                <div className=' flex items-center gap-6'>
+                    <span className=' text-white text-xl'>Hello {clientId}</span>
+                    <select className='px-8 py-[6px] outline-none' value={selectedPeriod} onChange={handlePeriodChange}>
+                        <option className='py-1' value=''>Select a Period</option>
+                        <option className='py-1' value='morning'>Morning</option>
+                        <option className='py-1' value='afternoon'>Afternoon</option>
+                        <option className='py-1' value='evening'>Evening</option>
+                    </select>
+                </div>
+                <span onClick={() => [localStorage.clear('userInfo'), navigate('/')]} className='text-white'>Logout</span>
+            </div>
             <div className='border-t-[1px] border-[#FFFFFF80] border-solid w-full mb-6'></div>
-            <div className='grid grid-cols-6 gap-8'>
-  {calendarController.map((item, index) => {
-    const filteredSlots = selectedPeriod
-      ? item.slots.filter((slot) => slot.period === selectedPeriod)
-      : item.slots;
+            <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
+                {calendarController.map((item, index) => {
+                    const filteredSlots = selectedPeriod
+                        ? item.slots.filter((slot) => slot.period === selectedPeriod)
+                        : item.slots;
 
-    return (
-      <div key={index} className='flex flex-col text-white gap-3'>
-        <ul className='flex flex-col items-center'>
-          <li className='font-semibold'>{item.day}</li>
-          <li>{item.date}</li>
-        </ul>
-        
-        {filteredSlots.map((element, idx) => {
-          const selectedUser = operationSlots?.find(
-            (res) => res.timestamp === element.timestamp && res.day === item.day && res.date === item.date
-          );
+                    return (
+                        <div key={index} className='flex flex-col text-white gap-3'>
+                            <ul className='flex flex-col items-center'>
+                                <li className='font-semibold'>{item.day}</li>
+                                <li>{item.date}</li>
+                            </ul>
 
-          const activeBooked = operationSlots.find(
-            (resultItem) =>
-              resultItem.timestamp === element.timestamp &&
-              resultItem.day === item.day &&
-              resultItem.date === item.date &&
-              resultItem.assignedDoctor
-          );
+                            {filteredSlots.map((element, idx) => {
+                                const selectedUser = operationSlots?.find(
+                                    (res) => res.timestamp === element.timestamp && res.day === item.day && res.date === item.date
+                                );
 
-          return (
-            <span
-              key={idx}
-              onClick={() => handleUpdateSlot(selectedUser)}
-              className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
-                } ${operationSlots.some(
-                  (resultItem) =>
-                    resultItem.timestamp === element.timestamp &&
-                    resultItem.day === item.day &&
-                    resultItem.date === item.date
-                )
-                  ? 'bg-[#00acc1]' // Add your color for matching slots
-                  : 'bg-[#FFFFFF80]' // Default color
-                }`}
-            >
-              {activeBooked?.assignedDoctor ? activeBooked?.assignedDoctor : element.timestamp}
-            </span>
-          );
-        })}
-      </div>
-    );
-  })}
-</div>
+                                const activeBooked = operationSlots.find(
+                                    (resultItem) =>
+                                        resultItem.timestamp === element.timestamp &&
+                                        resultItem.day === item.day &&
+                                        resultItem.date === item.date &&
+                                        resultItem.assignedDoctor
+                                );
+
+                                return (
+                                    <span
+                                        key={idx}
+                                        onClick={() => handleUpdateSlot(selectedUser)}
+                                        className={`px-8 py-2 overflow-hidden whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
+                                            } ${operationSlots.some(
+                                                (resultItem) =>
+                                                    resultItem.timestamp === element.timestamp &&
+                                                    resultItem.day === item.day &&
+                                                    resultItem.date === item.date
+                                            )
+                                                ? 'bg-[#00acc1]' // Add your color for matching slots
+                                                : 'bg-[#FFFFFF80]' // Default color
+                                            }`}
+                                    >
+                                        {activeBooked?.assignedDoctor ? activeBooked?.assignedDoctor : element.timestamp}
+                                    </span>
+                                );
+                            })}
+                        </div>
+                    );
+                })}
+            </div>
 
             <div className='border-t-[1px] border-[#FFFFFF80] border-solid w-full mt-10 mb-5'></div>
             <button
