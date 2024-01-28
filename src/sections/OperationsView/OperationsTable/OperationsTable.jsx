@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getAllDoctors, setDoctorsAvailable, setSelectedDoctor, updateOperationsCalendar } from '../../../redux/features/doctor/doctorSlice';
+import { getAllDoctors, setDoctorsAvailable, setSelectedDoctor, updateOperationsCalendar,setLogout } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 
 const OperationsTable = () => {
@@ -133,6 +133,11 @@ const OperationsTable = () => {
 
     }
 
+    function logOut() {
+        localStorage.clear('userInfo')
+        dispatch(setLogout())
+        navigate('/')
+    }
 
 
 
@@ -224,7 +229,7 @@ const OperationsTable = () => {
                         <option className='py-1' value='evening'>Evening</option>
                     </select>
                 </div>
-                <span onClick={() => [localStorage.clear('userInfo'), navigate('/')]} className='text-white'>Logout</span>
+                <span onClick={logOut} className='text-white cursor-pointer'>Logout</span>
             </div>
             <div className='md:border-t-[1px] border-[#FFFFFF80] border-solid w-full md:mb-6'></div>
             <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>

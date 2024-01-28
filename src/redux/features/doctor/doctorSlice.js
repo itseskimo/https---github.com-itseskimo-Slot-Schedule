@@ -51,7 +51,7 @@ export const addPhysioCalendar = createAsyncThunk("addPhysioCalendar", async (da
 
 
         const response = await axios.post(apiUrl, data.physioData, config);
-        return response.data;
+        return response;
     } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
             return rejectWithValue(error.response.data);
@@ -130,10 +130,14 @@ const doctorSlice = createSlice({
         selectedDoctor: null,
         selectedRemarks: null,
         error: null,
+        isPhysioSuccess:null
     },
 
     reducers: {
 
+        setLogout(state, action) {
+            state.userInfo = null;
+        },
         setRole(state, action) {
             state.role = action.payload;
         },
@@ -149,6 +153,12 @@ const doctorSlice = createSlice({
         },
         setDoctorsAppointment(state, action) {
             state.doctorsData = action.payload;
+        },
+        setError(state, action) {
+            state.error = null;
+        },
+        setSuccessReset(state, action) {
+            state.isPhysioSuccess = null;
         },
 
     },
@@ -183,15 +193,15 @@ const doctorSlice = createSlice({
             })
 
             .addCase(addPhysioCalendar.pending, (state) => {
-                state.physioInfo = null;
+                state.isPhysioSuccess = null;
                 state.error = null;
             })
-            // .addCase(addPhysioCalendar.fulfilled, (state, action: PayloadAction<String>) => {
-            //     state.physioInfo = action.payload;
-            //     state.error = null;
-            // })
+            .addCase(addPhysioCalendar.fulfilled, (state, action) => {
+                state.isPhysioSuccess = action.payload;
+                state.error = null;
+            })
             .addCase(addPhysioCalendar.rejected, (state, action) => {
-                state.physioInfo = null;
+                state.isPhysioSuccess = null;
                 state.error = action.payload;
             })
 
@@ -225,4 +235,4 @@ const doctorSlice = createSlice({
 });
 
 export default doctorSlice.reducer;
-export const { setRole, setDoctorsAvailable, setSelectedDoctor, setRemarks,setDoctorsAppointment } = doctorSlice.actions;
+export const { setRole, setDoctorsAvailable,setLogout,setError,setSuccessReset, setSelectedDoctor, setRemarks,setDoctorsAppointment } = doctorSlice.actions;

@@ -1,15 +1,15 @@
 import { FormInput } from '../../components/FormInput/FormInput';
-import { SyntheticEvent, useEffect, useState } from 'react';
+import {  useEffect, useState } from 'react';
 import { formSvgData } from '../../config/data';
 import Dropdown from '../../components/Dropdown/Dropdown';
-import { register, login } from '../../redux/features/doctor/doctorSlice';
+import { register, login ,setError} from '../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
 
     const dispatch = useDispatch();
-    const { role, userInfo } = useSelector((state) => state.doctor);
+    const { role, userInfo ,error} = useSelector((state) => state.doctor);
     const navigate = useNavigate();
 
     const [formToggler, setFormToggler] = useState(false)
@@ -69,7 +69,12 @@ const Auth = () => {
                 navigate('/patient')
             }
           }
-    }, [userInfo])
+
+          if(error){
+            alert(error.message)
+            dispatch(setError())
+          }
+    }, [userInfo,error])
 
 
     return (
