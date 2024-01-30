@@ -3,7 +3,7 @@ import { setTimestamp } from '../../../redux/features/doctor/doctorSlice';
 const PhysioDetails = () => {
     const dispatch = useDispatch();
 
-    const { doctorsList, removedSlots, timestamp ,deletedOutput} = useSelector((state) => state.doctor);
+    const { doctorsList, removedSlots, timestamp, deletedOutput } = useSelector((state) => state.doctor);
 
 
 
@@ -16,12 +16,35 @@ const PhysioDetails = () => {
                 <p className='py-5'>Fixhealth would like to know the days you are available for an appointment! Pick a time & date.</p>
             </div>
 
+            {/* overflow-y-auto max-h-[70vh] */}
 
 
+            <section className='flex items-center flex-wrap py-2 gap-5 '>
 
-            <ul className='flex items-center flex-wrap py-2 gap-5 overflow-y-auto max-h-[70vh]'>
 
-                {removedSlots?.slice().sort((a, b) => {
+                {deletedOutput.map((item, idx) => (
+                    <div key={idx} className='flex flex-col items-center justify-center gap-5'>
+                        
+                        <ul className='text-white flex flex-col items-center justify-center'>
+                            <li className='font-semibold'>{item.days}</li>
+                            <li>{item.dates}</li>
+                        </ul>
+                        {item.slots?.map((slot, i) => (
+                            <li
+                                style={{ background: timestamp?.timestamp === slot.timestamp && 'linear-gradient(90deg, rgba(6,15,23,1) 0%, rgba(4,65,78,1) 24%, rgba(3,86,101,1) 46%, rgba(2,109,126,1) 56%, rgba(144,238,144,1) 100%)' }}
+                                key={i}
+                                onClick={() => dispatch(setTimestamp(slot))}
+                                className={`px-8 py-2 whitespace-nowrap list-none rounded-md text-center relative ${timestamp?.timestamp === slot.timestamp ? 'bg-gradient' : 'bg-transparent'} shadow-sm shadow-green-400 cursor-pointer`}
+                            >
+                                {slot.timestamp}
+                            </li>
+                            
+                        ))}
+                    </div>
+                ))}
+
+
+                {/* {deletedOutput?.slice().sort((a, b) => {
 
                     const timeA = new Date(`2022-01-30 ${a.timestamp}`);
                     const timeB = new Date(`2022-01-30 ${b.timestamp}`);
@@ -30,8 +53,8 @@ const PhysioDetails = () => {
                     <li
                         style={{ background: timestamp?.timestamp === item.timestamp && 'linear-gradient(90deg, rgba(6,15,23,1) 0%, rgba(4,65,78,1) 24%, rgba(3,86,101,1) 46%, rgba(2,109,126,1) 56%, rgba(144,238,144,1) 100%)' }}
                         key={i} onClick={() => dispatch(setTimestamp(item))} className={` px-8 py-2 whitespace-nowrap rounded-md text-center relative bg-transparent shadow-sm shadow-green-400 cursor-pointer`}>{item.timestamp}</li>
-                ))}
-            </ul>
+                ))} */}
+            </section>
 
             {/* <div className='flex items-center gap-4'>
                 <svg className='h-7 w-7' viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" >
