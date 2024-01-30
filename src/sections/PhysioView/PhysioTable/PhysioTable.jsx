@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessReset, setRemovedSlots } from '../../../redux/features/doctor/doctorSlice';
+import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessReset, setRemovedSlots,convertToDesiredFormat } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -133,6 +133,7 @@ const PhysioTable = () => {
 
             if (deletedSlots.length) {
                 dispatch(setRemovedSlots(deletedSlots));
+                dispatch(convertToDesiredFormat(deletedSlots));
             }
 
             return {

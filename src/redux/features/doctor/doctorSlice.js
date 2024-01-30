@@ -126,13 +126,14 @@ const doctorSlice = createSlice({
         bookedSlots: null,
         doctorsList: null,
         availableDoctors: null,
-        doctorsData:null,
+        doctorsData: null,
         selectedDoctor: null,
         selectedRemarks: null,
         error: null,
-        isPhysioSuccess:null,
-        removedSlots:[],
-        timestamp:[]
+        isPhysioSuccess: null,
+        removedSlots: [],
+        timestamp: [],
+        deletedOutput: []
     },
 
     reducers: {
@@ -162,14 +163,44 @@ const doctorSlice = createSlice({
         setSuccessReset(state, action) {
             state.isPhysioSuccess = null;
         },
-        // setRemovedSlots(state, action) {
-        //     state.removedSlots = action.payload;
-        // },
+
         setRemovedSlots(state, action) {
             // Assuming action.payload is the item you want to push into the array
             state.removedSlots = [...state.removedSlots, ...(Array.isArray(action.payload) ? action.payload : [action.payload])];
         },
-        
+
+        convertToDesiredFormat(state, action) {
+            const data = state.removedSlots;
+            const convertedData = {};
+
+            data.forEach(slot => {
+                const key = `${slot.day}-${slot.date}`;
+
+                if (!convertedData[key]) {
+                    convertedData[key] = {
+                        days: slot.day,
+                        dates: slot.date,
+                        slots: []
+                    };
+                }
+
+                const existingSlot = convertedData[key].slots.find(existing => existing.timestamp === slot.timestamp);
+                if (!existingSlot) {
+                    convertedData[key].slots.push({
+                        timestamp: slot.timestamp,
+                        assignedDoctor: slot.assignedDoctor,
+                        remark: slot.remark,
+                        period: slot.period,
+                        day: slot.day,
+                        date: slot.date
+                    });
+                }
+            });
+
+            state.deletedOutput = Object.values(convertedData);
+        },
+
+
         setTimestamp(state, action) {
             state.timestamp = action.payload;
         },
@@ -247,4 +278,4 @@ const doctorSlice = createSlice({
 });
 
 export default doctorSlice.reducer;
-export const { setRole, setDoctorsAvailable,setLogout,setError,setTimestamp,setRemovedSlots,setSuccessReset, setSelectedDoctor, setRemarks,setDoctorsAppointment } = doctorSlice.actions;
+export const { setRole, setDoctorsAvailable, setLogout, setError, setTimestamp, convertToDesiredFormat, setRemovedSlots, setSuccessReset, setSelectedDoctor, setRemarks, setDoctorsAppointment } = doctorSlice.actions;

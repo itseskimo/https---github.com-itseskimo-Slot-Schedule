@@ -3,7 +3,7 @@ import { setTimestamp } from '../../../redux/features/doctor/doctorSlice';
 const PhysioDetails = () => {
     const dispatch = useDispatch();
 
-    const { doctorsList, removedSlots, timestamp } = useSelector((state) => state.doctor);
+    const { doctorsList, removedSlots, timestamp ,deletedOutput} = useSelector((state) => state.doctor);
 
 
 
