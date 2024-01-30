@@ -130,7 +130,9 @@ const doctorSlice = createSlice({
         selectedDoctor: null,
         selectedRemarks: null,
         error: null,
-        isPhysioSuccess:null
+        isPhysioSuccess:null,
+        removedSlots:[],
+        timestamp:[]
     },
 
     reducers: {
@@ -160,7 +162,17 @@ const doctorSlice = createSlice({
         setSuccessReset(state, action) {
             state.isPhysioSuccess = null;
         },
-
+        // setRemovedSlots(state, action) {
+        //     state.removedSlots = action.payload;
+        // },
+        setRemovedSlots(state, action) {
+            // Assuming action.payload is the item you want to push into the array
+            state.removedSlots = [...state.removedSlots, ...(Array.isArray(action.payload) ? action.payload : [action.payload])];
+        },
+        
+        setTimestamp(state, action) {
+            state.timestamp = action.payload;
+        },
     },
 
     extraReducers: (builder) => {
@@ -235,4 +247,4 @@ const doctorSlice = createSlice({
 });
 
 export default doctorSlice.reducer;
-export const { setRole, setDoctorsAvailable,setLogout,setError,setSuccessReset, setSelectedDoctor, setRemarks,setDoctorsAppointment } = doctorSlice.actions;
+export const { setRole, setDoctorsAvailable,setLogout,setError,setTimestamp,setRemovedSlots,setSuccessReset, setSelectedDoctor, setRemarks,setDoctorsAppointment } = doctorSlice.actions;

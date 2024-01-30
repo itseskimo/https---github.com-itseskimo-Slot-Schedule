@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
-import { addPhysioCalendar, getPhysioCalendar, setLogout ,setSuccessReset} from '../../../redux/features/doctor/doctorSlice';
+import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessReset, setRemovedSlots } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const PhysioTable = () => {
 
+    const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { bookedSlots,isPhysioSuccess} = useSelector((state) => state.doctor);
+    const { bookedSlots, isPhysioSuccess, timestamp } = useSelector((state) => state.doctor);
     const [selectedDates, setSelectedDates] = useState([]);
+    const [calendar, setCalendar] = useState([]);
     const [clientId, setClientId] = useState('');
     const [token, setToken] = useState('');
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (localStorage.getItem("userInfo")) {
@@ -22,26 +23,139 @@ const PhysioTable = () => {
                 dispatch(getPhysioCalendar({ token: loginData.token }))
             }
         }
-        
     }, []);
+
 
     useEffect(() => {
         setSelectedDates((bookedSlots && bookedSlots[0]?.calendars) ?? []);
     }, [bookedSlots]);
-    useEffect(() => {
 
-        if(isPhysioSuccess?.status === 200){
+
+
+    useEffect(() => {
+        if (isPhysioSuccess?.status === 200) {
             alert('Slots Successfully Booked')
             dispatch(setSuccessReset())
         }
-    }, [isPhysioSuccess]);
+
+        if (timestamp) {
+
+            setCalendar(prevCalendar => prevCalendar.map(element => {
+                if (element.day === timestamp.day && element.date === timestamp.date) {
+                    const isTimeStampExists = element.slots.some(item => item.timestamp === timestamp.timestamp);
+
+                    if (isTimeStampExists) return element
+                    const updatedSlots = [...element.slots, timestamp].sort((a, b) => {
+
+                        const timeA = new Date(`2022-01-30 ${a.timestamp}`);
+                        const timeB = new Date(`2022-01-30 ${b.timestamp}`);
+                        return timeA - timeB;
+                    });
+                    return {
+                        ...element,
+                        slots: updatedSlots
+                    };
+                }
+                return element;
+            }));
+
+
+
+            function filterObjects(array, selectedTime) {
+                return array.map(obj => {
+                    if (obj.day === selectedTime.day && obj.date === selectedTime.date) {
+                        obj.slots = obj.slots.filter(slot => {
+                            const slotTimestamp = convertTimeToTimestamp(slot.timestamp);
+                            const selectedTimestamp = convertTimeToTimestamp(selectedTime.timestamp);
+                            if (selectedTimestamp <= slotTimestamp && slotTimestamp - selectedTimestamp <= 30 * 60 * 1000) {
+                                dispatch(setRemovedSlots({...slot, day:obj.day , date:obj.date}));
+                            }
+                            return !(selectedTimestamp <= slotTimestamp && slotTimestamp - selectedTimestamp <= 30 * 60 * 1000);
+                        });
+                    }
+                    return obj;
+                });
+            }
+
+
+            function convertTimeToTimestamp(timeString) {
+                const [hours, minutes] = timeString.split(':');
+                const date = new Date();
+                date.setHours(parseInt(hours, 10));
+                date.setMinutes(parseInt(minutes, 10));
+                return date.getTime();
+            }
+
+            let filteredArray = filterObjects(calendar, timestamp);
+
+
+
+
+            setSelectedDates((selectedDates) => (
+                selectedDates.map(dateObj => ({
+                    ...dateObj,
+                    selectedSlots: dateObj.selectedSlots.filter(slot =>
+                        !(slot.timestamp === timestamp.timestamp && dateObj.day === timestamp.day && dateObj.date === timestamp.date)
+                    )
+                }))
+            ));
+
+        }
+    }, [isPhysioSuccess, timestamp]);
+
+
 
     function handleSubmit() {
         const physioData = selectedDates;
         dispatch(addPhysioCalendar({ physioData, token }));
     }
 
+
     function handleClick(day, date, selectedSlot) {
+
+        const selectedTime = new Date(`2022-01-30 ${selectedSlot.timestamp}`).getTime();
+        const next45Minutes = selectedTime + 30 * 60 * 1000;
+
+        let filteredData = calendar.map((dayData) => {
+
+
+
+            const deletedSlots = dayData.slots
+                .map(slot => ({
+                    ...slot,
+                    day: dayData.day,
+                    date: dayData.date
+                }))
+                .filter(slot => {
+                    const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
+                    if (slotTime === selectedTime && day === dayData.day && date === dayData.date) {
+                        return false;
+                    }
+                    return (slotTime > selectedTime && slotTime <= next45Minutes && day === dayData.day && date === dayData.date);
+                });
+
+
+            if (deletedSlots.length) {
+                dispatch(setRemovedSlots(deletedSlots));
+            }
+
+            return {
+                ...dayData,
+                slots: dayData.slots.filter((slot) => {
+                    const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
+
+                    // Keep the selected slot even if it falls within the time range
+                    if (slotTime === selectedTime && day === dayData.day && date === dayData.date) {
+                        return true;
+                    }
+
+                    return !(slotTime > selectedTime && slotTime <= next45Minutes && day === dayData.day && date === dayData.date);
+                }),
+            };
+        });
+
+        setCalendar(filteredData);
+
         if (currentDayIndex !== 0) {
             alert(`Slots available for Physios can only be selected on Sunday's`);
             return;
@@ -107,56 +221,59 @@ const PhysioTable = () => {
                 period: period,
             });
 
-            currentTime.setMinutes(currentTime.getMinutes() + 45);
+            currentTime.setMinutes(currentTime.getMinutes() + 15);
         }
 
         return timeSlots;
     };
 
 
+    // const currentDayIndex = new Date().getDay();
+    const currentDayIndex = 0;
 
-    const currentDayIndex = new Date().getDay();
+    useEffect(() => {
 
-    const getFormattedDate = (offset) => {
-        const today = new Date();
-        const targetDate = new Date(today);
-        targetDate.setDate(today.getDate() + offset);
+        const getFormattedDate = (offset) => {
+            const today = new Date();
+            const targetDate = new Date(today);
+            targetDate.setDate(today.getDate() + offset);
 
-        const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(targetDate);
-        const date = targetDate.getDate();
+            const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(targetDate);
+            const date = targetDate.getDate();
 
-        return `${month} ${date}`;
-    };
+            return `${month} ${date}`;
+        };
 
-    let calendarController = [
-        { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
-        { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
-        { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
-        { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
-        { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
-        { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
-        { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
-    ];
-
-    // Include the entire week starting from Monday if it's Sunday
-    if (currentDayIndex === 0) {
-        calendarController = [
+        let calendarController = [
+            { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
             { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
             { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
             { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
             { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
             { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
-            { day: 'Saturday', date: getFormattedDate(7), slots: generateTimeSlots() }
-        ]
-    } else {
-        // Filter days before the current day
-        calendarController = calendarController.filter((_, index) => index >= currentDayIndex);
-    }
+            { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
+        ];
 
-    // Now, calendarController contains the desired calendar information
+        // Include the entire week starting from Monday if it's Sunday
+        if (currentDayIndex === 0) {
+            calendarController = [
+                { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
+                { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
+                { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
+                { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
+                { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
+                { day: 'Saturday', date: getFormattedDate(7), slots: generateTimeSlots() }
+            ]
+        } else {
+            // Filter days before the current day
+            calendarController = calendarController.filter((_, index) => index >= currentDayIndex);
+        }
 
+        // Now, calendarController contains the desired calendar information
 
-    console.log(currentDayIndex)
+        setCalendar(calendarController)
+    }, [])
+
 
     function logOut() {
         localStorage.clear('userInfo')
@@ -174,11 +291,11 @@ const PhysioTable = () => {
 
             <div className='md:border-t-[1px] border-[#FFFFFF80] border-solid w-full md:mb-6'></div>
             <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
-                {calendarController.map((item, index) => (
+                {calendar.map((item, index) => (
                     <div key={index} className='flex flex-col text-white gap-3'>
                         <ul className='flex flex-col items-center'>
-                            <li className='font-semibold'>{item.day}</li>
-                            <li>{item.date}</li>
+                            <li className='font-semibold'>{item?.day}</li>
+                            <li>{item?.date}</li>
                         </ul>
                         {item.slots.map((element, idx) => {
                             const isSelected = selectedDates.find(

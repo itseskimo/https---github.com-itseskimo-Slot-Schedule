@@ -1,11 +1,12 @@
-import { useSelector } from 'react-redux';
-
+import { useSelector, useDispatch } from 'react-redux';
+import { setTimestamp } from '../../../redux/features/doctor/doctorSlice';
 const PhysioDetails = () => {
+    const dispatch = useDispatch();
 
-    const { doctorsList } = useSelector((state) => state.doctor);
+    const { doctorsList, removedSlots, timestamp } = useSelector((state) => state.doctor);
 
 
-  
+
 
 
     return (
@@ -16,9 +17,21 @@ const PhysioDetails = () => {
             </div>
 
 
-           
 
 
+            <ul className='flex items-center flex-wrap py-2 gap-5'>
+
+                {removedSlots?.slice().sort((a, b) => {
+
+                    const timeA = new Date(`2022-01-30 ${a.timestamp}`);
+                    const timeB = new Date(`2022-01-30 ${b.timestamp}`);
+                    return timeA - timeB;
+                })?.map((item, i) => (
+                    <li
+                        style={{ background: timestamp?.timestamp === item.timestamp && 'linear-gradient(90deg, rgba(6,15,23,1) 0%, rgba(4,65,78,1) 24%, rgba(3,86,101,1) 46%, rgba(2,109,126,1) 56%, rgba(144,238,144,1) 100%)' }}
+                        key={i} onClick={() => dispatch(setTimestamp(item))} className={` px-8 py-2 whitespace-nowrap rounded-md text-center relative bg-transparent shadow-sm shadow-green-400 cursor-pointer`}>{item.timestamp}</li>
+                ))}
+            </ul>
 
             {/* <div className='flex items-center gap-4'>
                 <svg className='h-7 w-7' viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" >
