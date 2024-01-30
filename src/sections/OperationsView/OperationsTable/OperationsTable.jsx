@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { getAllDoctors, setDoctorsAvailable, setSelectedDoctor, updateOperationsCalendar,setLogout } from '../../../redux/features/doctor/doctorSlice';
+import { getAllDoctors, setDoctorsAvailable, setSelectedDoctor, updateOperationsCalendar, setLogout } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 
 const OperationsTable = () => {
@@ -10,6 +10,7 @@ const OperationsTable = () => {
     const [clientId, setClientId] = useState('');
     const [operationSlots, setOperationSlots] = useState([]);
     const navigate = useNavigate();
+    const [calendar, setCalendar] = useState([]);
 
 
 
@@ -65,8 +66,6 @@ const OperationsTable = () => {
         const result = mergeUserData(doctorsList);
         setOperationSlots(result);
     }, [doctorsList]);
-
-
 
 
 
@@ -165,49 +164,58 @@ const OperationsTable = () => {
                 period: period,
             });
 
-            currentTime.setMinutes(currentTime.getMinutes() + 45);
+            currentTime.setMinutes(currentTime.getMinutes() + 15);
         }
 
         return timeSlots;
     };
 
-    const currentDayIndex = new Date().getDay();
 
-    const getFormattedDate = (offset) => {
-        const today = new Date();
-        const targetDate = new Date(today);
-        targetDate.setDate(today.getDate() + offset);
+    // const currentDayIndex = new Date().getDay();
+    const currentDayIndex = 0;
 
-        const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(targetDate);
-        const date = targetDate.getDate();
+    useEffect(() => {
 
-        return `${month} ${date}`;
-    };
+        const getFormattedDate = (offset) => {
+            const today = new Date();
+            const targetDate = new Date(today);
+            targetDate.setDate(today.getDate() + offset);
 
-    let calendarController = [
-        { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
-        { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
-        { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
-        { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
-        { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
-        { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
-        { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
-    ];
+            const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(targetDate);
+            const date = targetDate.getDate();
 
-    // Include the entire week starting from Monday if it's Sunday
-    if (currentDayIndex === 0) {
-        calendarController = [
+            return `${month} ${date}`;
+        };
+
+        let calendarController = [
+            { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
             { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
             { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
             { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
             { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
             { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
-            { day: 'Saturday', date: getFormattedDate(7), slots: generateTimeSlots() }
-        ]
-    } else {
-        // Filter days before the current day
-        calendarController = calendarController.filter((_, index) => index >= currentDayIndex);
-    }
+            { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
+        ];
+
+        // Include the entire week starting from Monday if it's Sunday
+        if (currentDayIndex === 0) {
+            calendarController = [
+                { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
+                { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
+                { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
+                { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
+                { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
+                { day: 'Saturday', date: getFormattedDate(7), slots: generateTimeSlots() }
+            ]
+        } else {
+            // Filter days before the current day
+            calendarController = calendarController.filter((_, index) => index >= currentDayIndex);
+        }
+
+        // Now, calendarController contains the desired calendar information
+
+        setCalendar(calendarController)
+    }, [])
 
 
     const [selectedPeriod, setSelectedPeriod] = useState(''); // Initial state is an empty string
@@ -233,7 +241,7 @@ const OperationsTable = () => {
             </div>
             <div className='md:border-t-[1px] border-[#FFFFFF80] border-solid w-full md:mb-6'></div>
             <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
-                {calendarController.map((item, index) => {
+                {calendar.map((item, index) => {
                     const filteredSlots = selectedPeriod
                         ? item.slots.filter((slot) => slot.period === selectedPeriod)
                         : item.slots;

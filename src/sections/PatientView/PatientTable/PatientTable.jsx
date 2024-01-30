@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { getAllDoctors ,setLogout} from '../../../redux/features/doctor/doctorSlice';
+import { getAllDoctors, setLogout } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -123,7 +123,7 @@ const PatientTable = () => {
     };
 
 
-    
+
     const getFormattedDate = (offset) => {
         const today = new Date();
         const targetDate = new Date(today);
@@ -162,7 +162,7 @@ const PatientTable = () => {
 
 
     const [selectedPeriod, setSelectedPeriod] = useState(''); // Initial state is an empty string
-console.log(operationSlots)
+    console.log(operationSlots)
 
     const handlePeriodChange = (event) => {
         setSelectedPeriod(event.target.value);
@@ -176,7 +176,7 @@ console.log(operationSlots)
 
     return (
         <section className='flex flex-col items-start p-6'>
-             <div className='mb-5 hidden md:flex items-center gap-6 justify-between  w-full '>
+            <div className='mb-5 hidden md:flex items-center gap-6 justify-between  w-full '>
 
                 <div className=' flex items-center gap-6'>
                     <span className=' text-white text-xl'>Hello {clientId}</span>
@@ -193,7 +193,7 @@ console.log(operationSlots)
             <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
 
                 {calendarController.map((item, index) => {
-console.log(operationSlots.filter((ele) => ele.day === item.day && ele.date === item.date))
+
                     return (
                         <div key={index} className='flex flex-col text-white gap-3'>
                             <ul className='flex flex-col items-center'>
