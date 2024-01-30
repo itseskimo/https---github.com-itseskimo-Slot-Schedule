@@ -68,7 +68,7 @@ const PhysioTable = () => {
                             const slotTimestamp = convertTimeToTimestamp(slot.timestamp);
                             const selectedTimestamp = convertTimeToTimestamp(selectedTime.timestamp);
                             if (selectedTimestamp <= slotTimestamp && slotTimestamp - selectedTimestamp <= 30 * 60 * 1000) {
-                                dispatch(setRemovedSlots({...slot, day:obj.day , date:obj.date}));
+                                dispatch(setRemovedSlots({ ...slot, day: obj.day, date: obj.date }));
                             }
                             return !(selectedTimestamp <= slotTimestamp && slotTimestamp - selectedTimestamp <= 30 * 60 * 1000);
                         });
@@ -76,7 +76,6 @@ const PhysioTable = () => {
                     return obj;
                 });
             }
-
 
             function convertTimeToTimestamp(timeString) {
                 const [hours, minutes] = timeString.split(':');
@@ -87,9 +86,6 @@ const PhysioTable = () => {
             }
 
             let filteredArray = filterObjects(calendar, timestamp);
-
-
-
 
             setSelectedDates((selectedDates) => (
                 selectedDates.map(dateObj => ({
@@ -193,6 +189,30 @@ const PhysioTable = () => {
                 return [...prevDates, { day, date, selectedSlots: [selectedSlot] }];
             }
         });
+
+
+
+
+
+
+
+        const selectedTim = new Date(`2022-01-30 ${selectedSlot.timestamp}`).getTime();
+        const prev30Minutes = selectedTime - 30 * 60 * 1000;
+
+
+        setSelectedDates((selectedDates) =>
+            selectedDates.map((dayData) => {
+                return {
+                    ...dayData,
+                    selectedSlots: dayData.selectedSlots.filter((slot) => {
+                        const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
+                        return !(slotTime >= prev30Minutes && slotTime < selectedTim && dayData.day === day && dayData.date === date)
+                    }),
+                };
+            })
+
+        );
+
     }
 
 
@@ -300,7 +320,7 @@ const PhysioTable = () => {
                         {item.slots.map((element, idx) => {
                             const isSelected = selectedDates.find(
                                 (date) => date.date === item.date
-                            )?.selectedSlots.some(
+                            )?.selectedSlots?.some(
                                 (slot) => slot.timestamp === element.timestamp
                             );
 
