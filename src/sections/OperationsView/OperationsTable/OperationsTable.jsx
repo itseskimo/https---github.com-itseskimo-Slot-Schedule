@@ -85,9 +85,9 @@ const OperationsTable = () => {
 
 
 
-    const handleUpdateSlot = (updatedSlot) => {
+    const handleUpdateSlot = (updatedSlot, id) => {
 
-        console.log(updatedSlot)
+        console.log(updatedSlot, id)
         dispatch(setDoctorsAvailable(updatedSlot));
     };
 
@@ -95,7 +95,7 @@ const OperationsTable = () => {
 
     function handleSubmit() {
         let updatedAvailableDoctors = availableDoctors;
-alert('Slot has been updated')
+        alert('Slot has been updated')
         if (availableDoctors.users.some((user) => user?.userId === selectedDoctor)) {
             // Update the remark for the selectedDoctor in availableDoctors.users
             updatedAvailableDoctors = {
@@ -246,12 +246,13 @@ alert('Slot has been updated')
                 <span onClick={logOut} className='text-white cursor-pointer'>Logout</span>
             </div>
             <div className='md:border-t-[1px] border-[#FFFFFF80] border-solid w-full md:mb-6'></div>
-            <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
+            {/* <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
                 {calendar.map((item, index) => {
 
                     const filteredSlots = selectedPeriod
                         ? item.slots.filter((slot) => slot.period === selectedPeriod)
                         : item.slots;
+                    const toggleArray = operationSlots.filter((ele) => ele.day === item.day && ele.date === item.date)
 
                     return (
                         <div key={index} className='flex flex-col text-white gap-3'>
@@ -260,8 +261,8 @@ alert('Slot has been updated')
                                 <li>{item.date}</li>
                             </ul>
 
-                            {operationSlots.filter((ele) => ele.day === item.day && ele.date === item.date).map((element, idx) => {
-                                
+                            {toggleArray.map((element, idx) => {
+
                                 const selectedUser = operationSlots?.find(
                                     (res) => res.timestamp === element.timestamp && res.day === item.day && res.date === item.date
                                 );
@@ -273,18 +274,13 @@ alert('Slot has been updated')
                                         resultItem.date === item.date &&
                                         resultItem.assignedDoctor
                                 );
-console.log(element)
+                                console.log(activeBooked)
                                 return (
                                     <span
                                         key={idx}
                                         onClick={() => handleUpdateSlot(selectedUser)}
                                         className={`px-8 py-2 overflow-hidden whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
-                                            } ${operationSlots.some(
-                                                (resultItem) =>
-                                                    resultItem.timestamp === element.timestamp &&
-                                                    resultItem.day === item.day &&
-                                                    resultItem.date === item.date
-                                            )
+                                            } ${activeBooked?.assignedDoctor
                                                 ? 'bg-[#00acc1]' // Add your color for matching slots
                                                 : 'bg-[#FFFFFF80]' // Default color
                                             }`}
@@ -296,7 +292,60 @@ console.log(element)
                         </div>
                     );
                 })}
+            </div> */}
+<div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
+    {calendar.map((item, index) => {
+
+        // Filter slots based on the selected period
+        const filteredSlots = selectedPeriod
+            ? item.slots.filter((slot) => slot.period === selectedPeriod)
+            : item.slots;
+
+        // Create toggleArray based on some condition (operationSlots in this case)
+        const toggleArray = filteredSlots.filter((slot) => {
+            // Replace the condition below with your actual condition
+            return operationSlots.some((ele) => ele.day === item.day && ele.date === item.date && ele.timestamp === slot.timestamp);
+        });
+
+        return (
+            <div key={index} className='flex flex-col text-white gap-3'>
+                <ul className='flex flex-col items-center'>
+                    <li className='font-semibold'>{item.day}</li>
+                    <li>{item.date}</li>
+                </ul>
+
+                {toggleArray.map((element, idx) => {
+
+                    const selectedUser = operationSlots?.find(
+                        (res) => res.timestamp === element.timestamp && res.day === item.day && res.date === item.date
+                    );
+
+                    const activeBooked = operationSlots.find(
+                        (resultItem) =>
+                            resultItem.timestamp === element.timestamp &&
+                            resultItem.day === item.day &&
+                            resultItem.date === item.date &&
+                            resultItem.assignedDoctor
+                    );
+
+                    return (
+                        <span
+                            key={idx}
+                            onClick={() => handleUpdateSlot(selectedUser)}
+                            className={`px-8 py-2 overflow-hidden whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
+                                } ${activeBooked?.assignedDoctor
+                                    ? 'bg-[#00acc1]' // Add your color for matching slots
+                                    : 'bg-[#FFFFFF80]' // Default color
+                                }`}
+                        >
+                            {activeBooked?.assignedDoctor ? activeBooked?.assignedDoctor : element.timestamp}
+                        </span>
+                    );
+                })}
             </div>
+        );
+    })}
+</div>
 
 
 
@@ -313,7 +362,7 @@ console.log(element)
                             .map((element, idx) => {
                                 // Declare activeBooked outside the inner map function
                                 let activeBooked;
-
+                               
                                 return (
                                     <React.Fragment key={idx}>
                                         {selectedPeriod
@@ -330,7 +379,7 @@ console.log(element)
 
                                                     return (
                                                         <span
-                                                            onClick={() => handleUpdateSlot(element)}
+                                                            onClick={() => handleUpdateSlot(element,activeBooked)}
                                                             key={userIndex}
                                                             className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'} bg-[#00acc1]`}
                                                         >
@@ -349,7 +398,7 @@ console.log(element)
 
                                                 return (
                                                     <span
-                                                        onClick={() => handleUpdateSlot(element)}
+                                                        onClick={() => handleUpdateSlot(element,activeBooked)}
                                                         key={userIndex}
                                                         className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'} bg-[#00acc1]`}
                                                     >
@@ -362,7 +411,7 @@ console.log(element)
                             })}
                     </div>
                 ))}
-            </div> */}
+            </div>   */}
 
 
 

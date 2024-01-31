@@ -140,6 +140,8 @@ const doctorSlice = createSlice({
 
         setLogout(state, action) {
             state.userInfo = null;
+            state.deletedOutput=[]
+            state.removedSlots=[]
         },
         setRole(state, action) {
             state.role = action.payload;
