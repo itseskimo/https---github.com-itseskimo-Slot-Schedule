@@ -300,70 +300,70 @@ console.log(element)
 
 
 
-<div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
-    {calendar.map((item, index) => (
-        <div key={index} className='flex flex-col text-white gap-3'>
-            <ul className='flex flex-col items-center'>
-                <li className='font-semibold'>{item.day}</li>
-                <li>{item.date}</li>
-            </ul>
+            <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
+                {calendar.map((item, index) => (
+                    <div key={index} className='flex flex-col text-white gap-3'>
+                        <ul className='flex flex-col items-center'>
+                            <li className='font-semibold'>{item.day}</li>
+                            <li>{item.date}</li>
+                        </ul>
 
-            {operationSlots
-                .filter((ele) => ele.day === item.day && ele.date === item.date)
-                .map((element, idx) => {
-                    // Declare activeBooked outside the inner map function
-                    let activeBooked;
+                        {operationSlots
+                            .filter((ele) => ele.day === item.day && ele.date === item.date)
+                            .map((element, idx) => {
+                                // Declare activeBooked outside the inner map function
+                                let activeBooked;
 
-                    return (
-                        <React.Fragment key={idx}>
-                            {selectedPeriod
-                                ? element.users
-                                    .filter((user) => user.period === selectedPeriod)
-                                    .map((ele, userIndex) => {
-                                        activeBooked = operationSlots.find(
-                                            (resultItem) =>
-                                                resultItem.timestamp === element.timestamp &&
-                                                resultItem.day === item.day &&
-                                                resultItem.date === item.date &&
-                                                resultItem.assignedDoctor
-                                        );
+                                return (
+                                    <React.Fragment key={idx}>
+                                        {selectedPeriod
+                                            ? element.users
+                                                .filter((user) => user.period === selectedPeriod)
+                                                .map((ele, userIndex) => {
+                                                    activeBooked = operationSlots.find(
+                                                        (resultItem) =>
+                                                            resultItem.timestamp === element.timestamp &&
+                                                            resultItem.day === item.day &&
+                                                            resultItem.date === item.date &&
+                                                            resultItem.assignedDoctor
+                                                    );
 
-                                        return (
-                                            <span
-                                                onClick={() => handleUpdateSlot(element)}
-                                                key={userIndex}
-                                                className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'} bg-[#00acc1]`}
-                                            >
-                                                {activeBooked?.assignedDoctor ? activeBooked?.assignedDoctor : element.timestamp}
-                                            </span>
-                                        );
-                                    })
-                                : element.users.map((ele, userIndex) => {
-                                    activeBooked = operationSlots.find(
-                                        (resultItem) =>
-                                            resultItem.timestamp === element.timestamp &&
-                                            resultItem.day === item.day &&
-                                            resultItem.date === item.date &&
-                                            resultItem.assignedDoctor
-                                    );
+                                                    return (
+                                                        <span
+                                                            onClick={() => handleUpdateSlot(element)}
+                                                            key={userIndex}
+                                                            className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'} bg-[#00acc1]`}
+                                                        >
+                                                            {activeBooked?.assignedDoctor ? activeBooked?.assignedDoctor : element.timestamp}
+                                                        </span>
+                                                    );
+                                                })
+                                            : element.users.map((ele, userIndex) => {
+                                                activeBooked = operationSlots.find(
+                                                    (resultItem) =>
+                                                        resultItem.timestamp === element.timestamp &&
+                                                        resultItem.day === item.day &&
+                                                        resultItem.date === item.date &&
+                                                        resultItem.assignedDoctor
+                                                );
 
-                                    return (
-                                        <span
-                                            onClick={() => handleUpdateSlot(element)}
-                                            key={userIndex}
-                                            className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'} bg-[#00acc1]`}
-                                        >
-                                            {activeBooked?.assignedDoctor ? activeBooked?.assignedDoctor : element.timestamp}
-                                        </span>
-                                    );
-                                })}
-                        </React.Fragment>
-                    );
-                })}
-        </div>
-    ))}
-</div>
- 
+                                                return (
+                                                    <span
+                                                        onClick={() => handleUpdateSlot(element)}
+                                                        key={userIndex}
+                                                        className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'} bg-[#00acc1]`}
+                                                    >
+                                                        {activeBooked?.assignedDoctor ? activeBooked?.assignedDoctor : element.timestamp}
+                                                    </span>
+                                                );
+                                            })}
+                                    </React.Fragment>
+                                );
+                            })}
+                    </div>
+                ))}
+            </div>
+
 
 
 

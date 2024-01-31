@@ -69,6 +69,8 @@ const PhysioTable = () => {
                             const selectedTimestamp = convertTimeToTimestamp(selectedTime.timestamp);
                             if (selectedTimestamp <= slotTimestamp && slotTimestamp - selectedTimestamp <= 30 * 60 * 1000) {
                                 dispatch(setRemovedSlots({ ...slot, day: obj.day, date: obj.date }));
+                                dispatch(convertToDesiredFormat({ ...slot, day: obj.day, date: obj.date }));
+
                             }
                             return !(selectedTimestamp <= slotTimestamp && slotTimestamp - selectedTimestamp <= 30 * 60 * 1000);
                         });
@@ -106,7 +108,7 @@ const PhysioTable = () => {
         dispatch(addPhysioCalendar({ physioData, token }));
     }
 
-
+console.log(selectedDates,'selectedates')
     function handleClick(day, date, selectedSlot) {
 
         const selectedTime = new Date(`2022-01-30 ${selectedSlot.timestamp}`).getTime();
