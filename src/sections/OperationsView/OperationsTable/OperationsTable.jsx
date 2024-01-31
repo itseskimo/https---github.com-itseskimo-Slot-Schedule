@@ -95,7 +95,7 @@ const OperationsTable = () => {
 
     function handleSubmit() {
         let updatedAvailableDoctors = availableDoctors;
-
+alert('Slot has been updated')
         if (availableDoctors.users.some((user) => user?.userId === selectedDoctor)) {
             // Update the remark for the selectedDoctor in availableDoctors.users
             updatedAvailableDoctors = {
