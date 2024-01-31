@@ -236,6 +236,12 @@ const PatientTable = () => {
                 })}
             </div>
 
+
+
+
+           
+
+
             <div className='border-t-[1px] border-[#FFFFFF80] border-solid w-full mt-10 mb-5'></div>
             <button
                 className='bg-[#081c1f] px-10 py-2 text-white  rounded-md shadow-sm shadow-[#00acc1] font-light'

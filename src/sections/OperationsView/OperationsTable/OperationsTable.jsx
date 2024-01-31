@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { getAllDoctors, setDoctorsAvailable, setSelectedDoctor, updateOperationsCalendar, setLogout } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
 
 const OperationsTable = () => {
 
@@ -82,10 +83,11 @@ const OperationsTable = () => {
     }, []);
 
 
-    console.log(operationSlots)
 
 
     const handleUpdateSlot = (updatedSlot) => {
+
+        console.log(updatedSlot)
         dispatch(setDoctorsAvailable(updatedSlot));
     };
 
@@ -219,11 +221,15 @@ const OperationsTable = () => {
 
 
     const [selectedPeriod, setSelectedPeriod] = useState(''); // Initial state is an empty string
-
+    console.log(selectedPeriod)
 
     const handlePeriodChange = (event) => {
         setSelectedPeriod(event.target.value);
     };
+
+    console.log(operationSlots, 'operationSlots')
+    console.log(calendar, 'calendar')
+
     return (
         <section className='flex flex-col items-start p-6'>
             <div className='mb-5 hidden md:flex items-center gap-6 justify-between  w-full '>
@@ -240,8 +246,9 @@ const OperationsTable = () => {
                 <span onClick={logOut} className='text-white cursor-pointer'>Logout</span>
             </div>
             <div className='md:border-t-[1px] border-[#FFFFFF80] border-solid w-full md:mb-6'></div>
-            <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
+            {/* <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
                 {calendar.map((item, index) => {
+
                     const filteredSlots = selectedPeriod
                         ? item.slots.filter((slot) => slot.period === selectedPeriod)
                         : item.slots;
@@ -253,7 +260,8 @@ const OperationsTable = () => {
                                 <li>{item.date}</li>
                             </ul>
 
-                            {filteredSlots.map((element, idx) => {
+                            {operationSlots.filter((ele) => ele.day === item.day && ele.date === item.date).map((element, idx) => {
+                                
                                 const selectedUser = operationSlots?.find(
                                     (res) => res.timestamp === element.timestamp && res.day === item.day && res.date === item.date
                                 );
@@ -265,7 +273,7 @@ const OperationsTable = () => {
                                         resultItem.date === item.date &&
                                         resultItem.assignedDoctor
                                 );
-
+console.log(element)
                                 return (
                                     <span
                                         key={idx}
@@ -288,7 +296,78 @@ const OperationsTable = () => {
                         </div>
                     );
                 })}
-            </div>
+            </div> */}
+
+
+
+<div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-8'>
+    {calendar.map((item, index) => (
+        <div key={index} className='flex flex-col text-white gap-3'>
+            <ul className='flex flex-col items-center'>
+                <li className='font-semibold'>{item.day}</li>
+                <li>{item.date}</li>
+            </ul>
+
+            {operationSlots
+                .filter((ele) => ele.day === item.day && ele.date === item.date)
+                .map((element, idx) => {
+                    // Declare activeBooked outside the inner map function
+                    let activeBooked;
+
+                    return (
+                        <React.Fragment key={idx}>
+                            {selectedPeriod
+                                ? element.users
+                                    .filter((user) => user.period === selectedPeriod)
+                                    .map((ele, userIndex) => {
+                                        activeBooked = operationSlots.find(
+                                            (resultItem) =>
+                                                resultItem.timestamp === element.timestamp &&
+                                                resultItem.day === item.day &&
+                                                resultItem.date === item.date &&
+                                                resultItem.assignedDoctor
+                                        );
+
+                                        return (
+                                            <span
+                                                onClick={() => handleUpdateSlot(element)}
+                                                key={userIndex}
+                                                className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'} bg-[#00acc1]`}
+                                            >
+                                                {activeBooked?.assignedDoctor ? activeBooked?.assignedDoctor : element.timestamp}
+                                            </span>
+                                        );
+                                    })
+                                : element.users.map((ele, userIndex) => {
+                                    activeBooked = operationSlots.find(
+                                        (resultItem) =>
+                                            resultItem.timestamp === element.timestamp &&
+                                            resultItem.day === item.day &&
+                                            resultItem.date === item.date &&
+                                            resultItem.assignedDoctor
+                                    );
+
+                                    return (
+                                        <span
+                                            onClick={() => handleUpdateSlot(element)}
+                                            key={userIndex}
+                                            className={`px-8 py-2 whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'} bg-[#00acc1]`}
+                                        >
+                                            {activeBooked?.assignedDoctor ? activeBooked?.assignedDoctor : element.timestamp}
+                                        </span>
+                                    );
+                                })}
+                        </React.Fragment>
+                    );
+                })}
+        </div>
+    ))}
+</div>
+ 
+
+
+
+
 
             <div className='border-t-[1px] border-[#FFFFFF80] border-solid w-full mt-10 mb-5'></div>
             <button
