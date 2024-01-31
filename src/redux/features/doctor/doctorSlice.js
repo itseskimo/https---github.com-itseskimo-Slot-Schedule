@@ -197,7 +197,16 @@ const doctorSlice = createSlice({
                 }
             });
 
-            state.deletedOutput = Object.values(convertedData);
+
+            const sortedOutput = Object.values(convertedData).map(entry => ({
+                ...entry,
+                slots: entry.slots.slice().sort((a, b) => {
+                    const timeA = new Date(`2000-01-01 ${a.timestamp}`);
+                    const timeB = new Date(`2000-01-01 ${b.timestamp}`);
+                    return timeA - timeB;
+                })
+            }));
+            state.deletedOutput = sortedOutput;
         },
 
 

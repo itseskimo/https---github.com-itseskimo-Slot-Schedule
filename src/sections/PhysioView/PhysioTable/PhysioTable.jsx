@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessReset, setRemovedSlots,convertToDesiredFormat } from '../../../redux/features/doctor/doctorSlice';
+import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessReset, setRemovedSlots, convertToDesiredFormat } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -89,14 +89,31 @@ const PhysioTable = () => {
 
             let filteredArray = filterObjects(calendar, timestamp);
 
-            setSelectedDates((selectedDates) => (
-                selectedDates.map(dateObj => ({
-                    ...dateObj,
-                    selectedSlots: dateObj.selectedSlots.filter(slot =>
-                        !(slot.timestamp === timestamp.timestamp && dateObj.day === timestamp.day && dateObj.date === timestamp.date)
-                    )
-                }))
-            ));
+            // setSelectedDates((selectedDates) => (
+            //     selectedDates.map(dateObj => ({
+            //         ...dateObj,
+            //         selectedSlots: dateObj.selectedSlots.filter(slot =>
+            //             !(slot.timestamp === timestamp.timestamp && dateObj.day === timestamp.day && dateObj.date === timestamp.date)
+            //         )
+            //     }))
+            // ));
+
+            const selectedTim = new Date(`2022-01-30 ${timestamp.timestamp}`).getTime();
+            const prev30Minutes = selectedTim - 30 * 60 * 1000;
+            const next30Minutes = selectedTim + 30 * 60 * 1000;
+
+            setSelectedDates((selectedDates) =>
+                selectedDates.map((dayData) => {
+                    return {
+                        ...dayData,
+                        selectedSlots: dayData.selectedSlots.filter((slot) => {
+                            const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
+                            return !(slotTime >= prev30Minutes && slotTime <= next30Minutes);
+                        }),
+                    };
+                })
+            );
+
 
         }
     }, [isPhysioSuccess, timestamp]);
@@ -108,7 +125,7 @@ const PhysioTable = () => {
         dispatch(addPhysioCalendar({ physioData, token }));
     }
 
-console.log(selectedDates,'selectedates')
+    console.log(selectedDates, 'selectedates')
     function handleClick(day, date, selectedSlot) {
 
         const selectedTime = new Date(`2022-01-30 ${selectedSlot.timestamp}`).getTime();
@@ -196,6 +213,8 @@ console.log(selectedDates,'selectedates')
 
 
 
+
+    
 
 
 
