@@ -98,22 +98,44 @@ const PhysioTable = () => {
             //     }))
             // ));
 
+            // const selectedTim = new Date(`2022-01-30 ${timestamp.timestamp}`).getTime();
+            // const prev30Minutes = selectedTim - 30 * 60 * 1000;
+            // const next30Minutes = selectedTim + 30 * 60 * 1000;
+
+            // setSelectedDates((selectedDates) =>
+            //     selectedDates.map((dayData) => {
+            //         return {
+            //             ...dayData,
+            //             selectedSlots: dayData.selectedSlots.filter((slot) => {
+            //                 const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
+            //                 return !(slotTime >= prev30Minutes && slotTime <= next30Minutes);
+            //             }),
+            //         };
+            //     })
+            // );
+
+
+
+
             const selectedTim = new Date(`2022-01-30 ${timestamp.timestamp}`).getTime();
             const prev30Minutes = selectedTim - 30 * 60 * 1000;
             const next30Minutes = selectedTim + 30 * 60 * 1000;
-
+    
             setSelectedDates((selectedDates) =>
                 selectedDates.map((dayData) => {
                     return {
                         ...dayData,
                         selectedSlots: dayData.selectedSlots.filter((slot) => {
                             const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
-                            return !(slotTime >= prev30Minutes && slotTime <= next30Minutes);
+    
+                            if (slotTime === selectedTim  && timestamp.day === dayData.day && timestamp.date === dayData.date) {
+                                return true;
+                            }
+                            return !(slotTime >= prev30Minutes && slotTime <= next30Minutes  && dayData.day === timestamp.day && dayData.date === timestamp.date);
                         }),
                     };
                 })
             );
-
 
         }
     }, [isPhysioSuccess, timestamp]);
@@ -213,14 +235,9 @@ const PhysioTable = () => {
 
 
 
-
-    
-
-
-
         const selectedTim = new Date(`2022-01-30 ${selectedSlot.timestamp}`).getTime();
-        const prev30Minutes = selectedTime - 30 * 60 * 1000;
-
+        const prev30Minutes = selectedTim - 30 * 60 * 1000;
+        const next30Minutes = selectedTim + 30 * 60 * 1000;
 
         setSelectedDates((selectedDates) =>
             selectedDates.map((dayData) => {
@@ -228,12 +245,36 @@ const PhysioTable = () => {
                     ...dayData,
                     selectedSlots: dayData.selectedSlots.filter((slot) => {
                         const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
-                        return !(slotTime >= prev30Minutes && slotTime < selectedTim && dayData.day === day && dayData.date === date)
+
+                        if (slotTime === selectedTim  && day === dayData.day && date === dayData.date) {
+                            return true;
+                        }
+                        return !(slotTime >= prev30Minutes && slotTime <= next30Minutes  && dayData.day === day && dayData.date === date);
                     }),
                 };
             })
-
         );
+
+    
+
+
+
+        // const selectedTim = new Date(`2022-01-30 ${selectedSlot.timestamp}`).getTime();
+        // const prev30Minutes = selectedTime - 30 * 60 * 1000;
+
+
+        // setSelectedDates((selectedDates) =>
+        //     selectedDates.map((dayData) => {
+        //         return {
+        //             ...dayData,
+        //             selectedSlots: dayData.selectedSlots.filter((slot) => {
+        //                 const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
+        //                 return !(slotTime >= prev30Minutes && slotTime < selectedTim && dayData.day === day && dayData.date === date)
+        //             }),
+        //         };
+        //     })
+
+        // );
 
     }
 

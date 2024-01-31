@@ -198,12 +198,32 @@ const doctorSlice = createSlice({
             });
 
 
-            const sortedOutput = Object.values(convertedData).map(entry => ({
+            // const sortedOutput = Object.values(convertedData).map(entry => ({
+            //     ...entry,
+            //     slots: entry.slots.slice().sort((a, b) => {
+            //         const timeA = new Date(`2000-01-01 ${a.timestamp}`);
+            //         const timeB = new Date(`2000-01-01 ${b.timestamp}`);
+            //         return timeA - timeB;
+            //     })
+            // }));
+            const sortedOutput = Object.values(convertedData).sort((a, b) => {
+                // First, compare based on days
+                const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                const dayA = daysOrder.indexOf(a.days);
+                const dayB = daysOrder.indexOf(b.days);
+        
+                if (dayA !== dayB) {
+                    return dayA - dayB;
+                }
+        
+                // If days are the same, compare based on timestamp
+                return a.slots[0].timestamp.localeCompare(b.slots[0].timestamp);
+            }).map(entry => ({
                 ...entry,
-                slots: entry.slots.slice().sort((a, b) => {
-                    const timeA = new Date(`2000-01-01 ${a.timestamp}`);
-                    const timeB = new Date(`2000-01-01 ${b.timestamp}`);
-                    return timeA - timeB;
+                slots: entry.slots.slice().sort((x, y) => {
+                    const timeX = new Date(`2000-01-01 ${x.timestamp}`);
+                    const timeY = new Date(`2000-01-01 ${y.timestamp}`);
+                    return timeX - timeY;
                 })
             }));
             state.deletedOutput = sortedOutput;
