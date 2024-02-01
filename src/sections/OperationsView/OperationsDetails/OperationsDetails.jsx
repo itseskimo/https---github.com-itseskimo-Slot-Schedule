@@ -1,17 +1,28 @@
-import { setSelectedDoctor, setRemarks, setDoctorsAppointment } from '../../../redux/features/doctor/doctorSlice';
+import { setSelectedDoctor, setRemarks, setDoctorsAppointment,setResetOperationSuccess ,setDoctorsAvailable} from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 const OperationsDetails = () => {
 
     const dispatch = useDispatch();
-    const { availableDoctors, selectedDoctor, doctorsList } = useSelector((state) => state.doctor);
+    const { availableDoctors, selectedDoctor, doctorsList ,isOperationSuccess} = useSelector((state) => state.doctor);
 
     const [email, setEmail] = useState('')
     const [isRemarksVisible, setisRemarksVisible] = useState('')
     const inputRef = useRef(null)
+    const ref = useRef(null);
 
+    
 
-
+    useEffect(() => {
+        if (isOperationSuccess?.message){
+            setEmail('')
+            dispatch(setResetOperationSuccess())
+            dispatch(setDoctorsAvailable([]))
+        } 
+        if(availableDoctors){
+            setisRemarksVisible('')
+        }
+    }, [isOperationSuccess, availableDoctors])
 
 
     const selectDoctor = (doc) => {
@@ -35,7 +46,7 @@ const OperationsDetails = () => {
                             timestamp: availableDoctors.timestamp,
                             period: slot.period,
                             assignedDoctor: doc,
-                            users: availableDoctors.users.map((user) => user.userId === doctor.name ? { userId: user.userId, remarks: inputRef.current.value || ''  } : user)
+                            users: availableDoctors.users.map((user) => user.userId === doctor.name ? { userId: user.userId, remarks: inputRef.current.value || '' } : user)
                         };
 
                         return slot.timestamp === availableDoctors.timestamp ? userEntry : slot
@@ -65,7 +76,7 @@ const OperationsDetails = () => {
 
 
             <div className='flex flex-col gap-2 my-6'>
-               <label>Enter Remarks:</label>
+                <label>Enter Remarks:</label>
                 <input ref={inputRef} value={email} onChange={(e) => [setEmail(e.target.value), dispatch(setRemarks(e.target.value))]} className=' outline-none rounded-[6px] py-[6px] text-[12px] md:text-[16px] md:py-[10px] px-4 w-full text-[#4C5864]  placeholder:text-[12px] md:placeholder:text-[14px] placeholder:text-[#4C5864]' placeholder='Remarks...' type="email" />
             </div>
 

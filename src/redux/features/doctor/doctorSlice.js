@@ -133,11 +133,16 @@ const doctorSlice = createSlice({
         isPhysioSuccess: null,
         removedSlots: [],
         timestamp: [],
-        deletedOutput: []
+        deletedOutput: [],
+        isOperationSuccess:null
     },
 
     reducers: {
 
+        setResetOperationSuccess(state, action) {
+            state.isOperationSuccess = null;
+           
+        },
         setLogout(state, action) {
             state.userInfo = null;
             state.deletedOutput=[]
@@ -305,8 +310,20 @@ const doctorSlice = createSlice({
                 state.doctorsList = null;
                 state.error = action.payload;
             })
+            .addCase(updateOperationsCalendar.pending, (state) => {
+                state.isOperationSuccess = null;
+                state.error = null;
+            })
+            .addCase(updateOperationsCalendar.fulfilled, (state, action) => {
+                state.isOperationSuccess = action.payload;
+                state.error = null;
+            })
+            .addCase(updateOperationsCalendar.rejected, (state, action) => {
+                state.isOperationSuccess = null;
+                state.error = action.payload;
+            })
     },
 });
 
 export default doctorSlice.reducer;
-export const { setRole, setDoctorsAvailable, setLogout, setError, setTimestamp, convertToDesiredFormat, setRemovedSlots, setSuccessReset, setSelectedDoctor, setRemarks, setDoctorsAppointment } = doctorSlice.actions;
+export const { setRole, setDoctorsAvailable, setLogout, setError, setTimestamp,setResetOperationSuccess, convertToDesiredFormat, setRemovedSlots, setSuccessReset, setSelectedDoctor, setRemarks, setDoctorsAppointment } = doctorSlice.actions;
