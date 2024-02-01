@@ -89,15 +89,18 @@ const OperationsDetails = () => {
 
                     {Object.keys(availableDoctors || [])?.length === 0 && <li>Sorry, No Doctors Currently Available!</li>}
                     {availableDoctors?.users?.map((doc, i) => (
+                        <div className='flex flex-col gap-2'>
                         <li
                             style={{ background: selectedDoctor === doc.userId && 'linear-gradient(90deg, rgba(6,15,23,1) 0%, rgba(4,65,78,1) 24%, rgba(3,86,101,1) 46%, rgba(2,109,126,1) 56%, rgba(144,238,144,1) 100%)' }}
                             key={i} onClick={() => [selectDoctor(doc.userId), setisRemarksVisible(doc.remarks)]} className={` px-8 py-2 whitespace-nowrap rounded-md text-center relative bg-transparent shadow-sm shadow-green-400 cursor-pointer`}>{doc.userId}</li>
+                            <li>{doc.remarks}</li>
+                            </div>
                     ))}
                 </ul>
 
             </section>
 
-            {isRemarksVisible && <p>REMARKS: {isRemarksVisible}</p>}
+            {/* {isRemarksVisible && <p>REMARKS: {isRemarksVisible}</p>} */}
 
 
         </section>)

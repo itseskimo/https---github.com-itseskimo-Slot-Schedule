@@ -7,7 +7,7 @@ import React from 'react';
 const OperationsTable = () => {
 
     const dispatch = useDispatch();
-    const { doctorsList, doctorsData, availableDoctors, selectedDoctor, selectedRemarks } = useSelector((state) => state.doctor);
+    const { doctorsList, availableDoctors, selectedDoctor, selectedRemarks } = useSelector((state) => state.doctor);
     const [clientId, setClientId] = useState('');
     const [operationSlots, setOperationSlots] = useState([]);
     const navigate = useNavigate();
@@ -15,8 +15,50 @@ const OperationsTable = () => {
 
 
 
+    const transformScheduleArrayToOriginalData = (doctorList, scheduleArray, userId) => {
+        const updatedUserData = doctorList.map(user => {
+            if (user.userId === userId) {
+                const updatedCalendars = user.calendars.map(calendar => {
+                    const matchingSchedules = scheduleArray.filter(schedule =>
+                        calendar.day === schedule.day && calendar.date === schedule.date
+                    );
 
+                    if (matchingSchedules.length > 0) {
+                        const updatedSlots = calendar.selectedSlots.map(slot => {
+                            const matchingSchedule = matchingSchedules.find(schedule =>
+                                slot.timestamp === schedule.timestamp
+                            );
 
+                            if (matchingSchedule) {
+                                const userEntry = {
+                                    timestamp: matchingSchedule.timestamp,
+                                    period: slot.period,
+                                    assignedDoctor: matchingSchedule.assignedDoctor,
+                                    users: matchingSchedule.users.map(user =>
+                                        user.userId === userId ? { userId: user.userId, remarks: user.remarks } : user
+                                    )
+                                };
+
+                                return userEntry;
+                            }
+
+                            return slot;
+                        });
+
+                        return { ...calendar, selectedSlots: updatedSlots };
+                    }
+
+                    return calendar;
+                });
+
+                return { ...user, calendars: updatedCalendars };
+            }
+
+            return user;
+        });
+
+        return updatedUserData;
+    };
 
 
     function mergeUserData(usersData) {
@@ -93,7 +135,7 @@ const OperationsTable = () => {
 
     function handleSubmit() {
         let updatedAvailableDoctors = availableDoctors;
-        // alert('Slot has been updated')
+        alert('Slot has been updated')
         if (availableDoctors.users.some((user) => user?.userId === selectedDoctor)) {
             // Update the remark for the selectedDoctor in availableDoctors.users
             updatedAvailableDoctors = {
@@ -104,7 +146,7 @@ const OperationsTable = () => {
             };
         }
 
-        
+
         const updatedDoctorList = operationSlots.map((res) => {
             if (
                 res?.day === updatedAvailableDoctors?.day &&
@@ -123,14 +165,10 @@ const OperationsTable = () => {
             }
             return res;
         });
-        // console.log(updatedDoctorList,'availableDoctors')
-        console.log(updatedDoctorList,'doctorsData')
 
-        // Dispatch the action to update the Redux store with the modified doctorsData
-        // dispatch(updateOperationsCalendar(doctorsData));
-        // console.log(doctorsData,'doctorsdata')
-        // console.log(updatedDoctorList,'updatedDoctorList')
-        // Update the local state with the modified operationSlots
+
+        const updatedOriginalData = transformScheduleArrayToOriginalData(doctorsList, updatedDoctorList, doctorsList[0]?.userId);
+        dispatch(updateOperationsCalendar(updatedOriginalData));
         setOperationSlots(updatedDoctorList);
         dispatch(setSelectedDoctor(''))
     }
@@ -227,8 +265,7 @@ const OperationsTable = () => {
         setSelectedPeriod(event.target.value);
     };
 
-    console.log(operationSlots, 'operationSlots')
-    console.log(calendar, 'calendar')
+  
 
     return (
         <section className='flex flex-col items-start p-6'>

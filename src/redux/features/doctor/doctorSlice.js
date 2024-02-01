@@ -134,7 +134,8 @@ const doctorSlice = createSlice({
         removedSlots: [],
         timestamp: [],
         deletedOutput: [],
-        isOperationSuccess:null
+        isOperationSuccess:null,
+        operationArray:[]
     },
 
     reducers: {
@@ -167,6 +168,9 @@ const doctorSlice = createSlice({
         setError(state, action) {
             state.error = null;
         },
+        // setOperationDataMutate(state, action) {
+        //     state.operationArray =  action.payload;
+        // },
         setSuccessReset(state, action) {
             state.isPhysioSuccess = null;
         },
