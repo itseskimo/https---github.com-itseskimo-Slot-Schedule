@@ -231,34 +231,13 @@ const PhysioTable = () => {
             })
         );
 
-
-
-
-
-        // const selectedTim = new Date(`2022-01-30 ${selectedSlot.timestamp}`).getTime();
-        // const prev30Minutes = selectedTime - 30 * 60 * 1000;
-
-
-        // setSelectedDates((selectedDates) =>
-        //     selectedDates.map((dayData) => {
-        //         return {
-        //             ...dayData,
-        //             selectedSlots: dayData.selectedSlots.filter((slot) => {
-        //                 const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
-        //                 return !(slotTime >= prev30Minutes && slotTime < selectedTim && dayData.day === day && dayData.date === date)
-        //             }),
-        //         };
-        //     })
-
-        // );
-
     }
 
 
 
     const generateTimeSlots = () => {
         const startTime = new Date('2024-01-01T09:00:00');
-        const endTime = new Date('2024-01-01T20:00:00');
+        const endTime = new Date('2024-01-01T18:00:00');
         const timeSlots = [];
 
         let currentTime = new Date(startTime);
