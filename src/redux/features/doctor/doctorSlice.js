@@ -175,10 +175,26 @@ const doctorSlice = createSlice({
             state.isPhysioSuccess = null;
         },
 
+        // setRemovedSlots(state, action) {
+            
+            
+        //     // Assuming action.payload is the item you want to push into the array
+        //     state.removedSlots = [...state.removedSlots, ...(Array.isArray(action.payload) ? action.payload : [action.payload])];
+        // },
+
         setRemovedSlots(state, action) {
             // Assuming action.payload is the item you want to push into the array
-            state.removedSlots = [...state.removedSlots, ...(Array.isArray(action.payload) ? action.payload : [action.payload])];
-        },
+            const newSlots = Array.isArray(action.payload) ? action.payload : [action.payload];
+          
+            // Remove duplicates based on 'timestamp' property
+            const uniqueSlots = newSlots.filter((slot) => {
+              return state.removedSlots.findIndex((s) => s.timestamp === slot.timestamp && s.day === slot.day) === -1;
+            });
+          
+            // Update the state with unique slots
+            state.removedSlots = [...state.removedSlots, ...uniqueSlots];
+          },
+
 
         convertToDesiredFormat(state, action) {
             const data = state.removedSlots;

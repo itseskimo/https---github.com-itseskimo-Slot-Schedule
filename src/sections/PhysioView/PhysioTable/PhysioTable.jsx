@@ -7,11 +7,12 @@ const PhysioTable = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { bookedSlots, isPhysioSuccess, timestamp } = useSelector((state) => state.doctor);
+    const { bookedSlots, isPhysioSuccess, timestamp, removedSlots } = useSelector((state) => state.doctor);
     const [selectedDates, setSelectedDates] = useState([]);
     const [calendar, setCalendar] = useState([]);
     const [clientId, setClientId] = useState('');
     const [token, setToken] = useState('');
+
 
     useEffect(() => {
         if (localStorage.getItem("userInfo")) {
@@ -37,81 +38,7 @@ const PhysioTable = () => {
             alert('Slots Successfully Booked')
             dispatch(setSuccessReset())
         }
-
-        if (timestamp) {
-
-            setCalendar(prevCalendar => prevCalendar.map(element => {
-                if (element.day === timestamp.day && element.date === timestamp.date) {
-                    const isTimeStampExists = element.slots.some(item => item.timestamp === timestamp.timestamp);
-
-                    if (isTimeStampExists) return element
-                    const updatedSlots = [...element.slots, timestamp].sort((a, b) => {
-
-                        const timeA = new Date(`2022-01-30 ${a.timestamp}`);
-                        const timeB = new Date(`2022-01-30 ${b.timestamp}`);
-                        return timeA - timeB;
-                    });
-                    return {
-                        ...element,
-                        slots: updatedSlots
-                    };
-                }
-                return element;
-            }));
-
-
-
-            function filterObjects(array, selectedTime) {
-                return array.map(obj => {
-                    if (obj.day === selectedTime.day && obj.date === selectedTime.date) {
-                        obj.slots = obj.slots.filter(slot => {
-                            const slotTimestamp = convertTimeToTimestamp(slot.timestamp);
-                            const selectedTimestamp = convertTimeToTimestamp(selectedTime.timestamp);
-                            if (selectedTimestamp <= slotTimestamp && slotTimestamp - selectedTimestamp <= 30 * 60 * 1000) {
-                                dispatch(setRemovedSlots({ ...slot, day: obj.day, date: obj.date }));
-                                dispatch(convertToDesiredFormat({ ...slot, day: obj.day, date: obj.date }));
-
-                            }
-                            return !(selectedTimestamp <= slotTimestamp && slotTimestamp - selectedTimestamp <= 30 * 60 * 1000);
-                        });
-                    }
-                    return obj;
-                });
-            }
-
-            function convertTimeToTimestamp(timeString) {
-                const [hours, minutes] = timeString.split(':');
-                const date = new Date();
-                date.setHours(parseInt(hours, 10));
-                date.setMinutes(parseInt(minutes, 10));
-                return date.getTime();
-            }
-
-            let filteredArray = filterObjects(calendar, timestamp);
-
-
-            const selectedTim = new Date(`2022-01-30 ${timestamp.timestamp}`).getTime();
-            const prev30Minutes = selectedTim - 30 * 60 * 1000;
-            const next30Minutes = selectedTim + 30 * 60 * 1000;
-
-            setSelectedDates((selectedDates) =>
-                selectedDates.map((dayData) => {
-                    return {
-                        ...dayData,
-                        selectedSlots: dayData.selectedSlots.filter((slot) => {
-                            const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
-
-                            if (slotTime === selectedTim && timestamp.day === dayData.day && timestamp.date === dayData.date) {
-                                return true;
-                            }
-                            return !(slotTime >= prev30Minutes && slotTime <= next30Minutes && dayData.day === timestamp.day && dayData.date === timestamp.date);
-                        }),
-                    };
-                })
-            );
-           
-        }
-    }, [isPhysioSuccess, timestamp]);
+    }, [isPhysioSuccess]);
 
 
 
@@ -120,7 +47,6 @@ const PhysioTable = () => {
         dispatch(addPhysioCalendar({ physioData, token }));
     }
 
-    console.log(selectedDates, 'selectedates')
 
 
 
@@ -131,8 +57,6 @@ const PhysioTable = () => {
 
         let filteredData = calendar.map((dayData) => {
 
-
-
             const deletedSlots = dayData.slots
                 .map(slot => ({
                     ...slot,
@@ -140,7 +64,7 @@ const PhysioTable = () => {
                     date: dayData.date
                 }))
                 .filter(slot => {
-                    const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
+                    const slotTime = new Date(`2022-01-30 ${slot?.timestamp}`).getTime();
                     if (slotTime === selectedTime && day === dayData.day && date === dayData.date) {
                         return false;
                     }
@@ -150,13 +74,12 @@ const PhysioTable = () => {
 
             if (deletedSlots.length) {
                 dispatch(setRemovedSlots(deletedSlots));
-                dispatch(convertToDesiredFormat(deletedSlots));
             }
 
             return {
                 ...dayData,
                 slots: dayData.slots.filter((slot) => {
-                    const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
+                    const slotTime = new Date(`2022-01-30 ${slot?.timestamp}`).getTime();
 
                     // Keep the selected slot even if it falls within the time range
                     if (slotTime === selectedTime && day === dayData.day && date === dayData.date) {
@@ -169,25 +92,126 @@ const PhysioTable = () => {
         });
 
         setCalendar(filteredData);
+        // ------------------------------------------------
 
-        if (currentDayIndex !== 0) {
-            alert(`Slots available for Physios can only be selected on Sunday's`);
-            return;
-        }
+        let data = selectedDates.map((dayData) => {
 
+            return {
+                ...dayData,
+                selectedSlots: dayData.selectedSlots.filter((slot) => {
+                    const slotTime = new Date(`2022-01-30 ${slot?.timestamp}`).getTime();
+
+                    return !(slotTime > selectedTime && slotTime <= next45Minutes && day === dayData.day && date === dayData.date);
+                }),
+            };
+        });
+        setSelectedDates(data)
+
+
+        let res = data.map((element) => {
+            return {
+                ...element,  // Retain other properties of the element
+                selectedSlots: element.selectedSlots.filter((ele) => {
+                    // Convert the timestamp of the current element in selectedSlots to milliseconds
+                    let selectedSlotTime = new Date(`2022-01-30 ${ele?.timestamp}`).getTime();
+
+                    // Calculate the time difference in minutes
+                    let timeDifferenceInMinutes = (selectedSlotTime - selectedTime) / (60 * 1000);
+
+                    // Check if the time difference is more than or equal to 1 hour but less than or equal to 75 minutes
+                    return 60 <= timeDifferenceInMinutes && timeDifferenceInMinutes <= 75 && day === element.day && date === element.date;
+                }),
+            };
+        });
+        const anySelectedSlotsWithinNext75Minutes = res.some(element => element.selectedSlots.length > 0);
+
+
+
+
+        let result = data.map((element) => {
+            let opted = element.selectedSlots.find((ele) => {
+                // Convert the timestamp of the current element in selectedSlots to milliseconds
+                let selectedSlotTime = new Date(`2022-01-30 ${ele?.timestamp}`).getTime();
+
+                // Calculate the time difference in minutes
+                let timeDifferenceInMinutes = (selectedSlotTime - selectedTime) / (60 * 1000);
+
+                // Check if the time difference is more than or equal to 1 hour but less than or equal to 75 minutes
+                return 60 <= timeDifferenceInMinutes && timeDifferenceInMinutes <= 75 && day === element.day && date === element.date;
+            });
+
+            return opted && opted
+
+        });
+
+
+        let answer = result.filter((item) => item !== undefined)
+        let ans = answer[0]?.timestamp
+
+
+
+
+        // ------------------------------------------------
         setSelectedDates((prevDates) => {
             const existingDateIndex = prevDates.findIndex((dateObj) => dateObj.date === date);
 
             if (existingDateIndex !== -1) {
+
                 // Date already exists, toggle selectedSlot
                 return prevDates.map((dateObj, index) => {
                     if (index === existingDateIndex) {
                         // Update the existing date
                         const existingSlots = dateObj.selectedSlots;
-                        const existingSlotIndex = existingSlots.findIndex((slot) => slot.timestamp === selectedSlot.timestamp);
+                        const existingSlotIndex = existingSlots.findIndex((slot) => slot?.timestamp === selectedSlot.timestamp);
+
+
 
                         if (existingSlotIndex !== -1) {
                             // SelectedSlot already exists, remove it
+
+                            const selectedInterval = new Date(`2022-01-30 ${selectedSlot.timestamp}`).getTime();
+                            const next45Min = selectedInterval + 30 * 60 * 1000;  // Use selectedInterval instead of selectedTime
+
+
+                            let additBack = removedSlots.filter(element => {
+                                const slotTime = new Date(`2022-01-30 ${element.timestamp}`).getTime();
+                                return (
+                                    slotTime > selectedInterval &&
+                                    slotTime <= next45Min &&
+                                    day === element.day &&
+                                    date === element.date
+                                );
+                            }).sort((a, b) => new Date(`2022-01-30 ${a.timestamp}`).getTime() - new Date(`2022-01-30 ${b.timestamp}`).getTime());
+
+
+
+
+
+                            const updatedDaysArray = filteredData.map(dayObj => {
+                                const updatedSlots = dayObj.slots.map(slot => {
+                                    // const isTimestampPresent = dayObj.slots.some(slot => slot?.timestamp === selectedSlot.timestamp);
+                                    // if (!isTimestampPresent) return
+                                    if (slot?.timestamp === selectedSlot.timestamp && dateObj.date === date && dayObj.day === day) {
+                                        // Matched timestamp, add the two values
+                                        return [
+                                            slot,
+                                            ...additBack
+                                        ]
+                                    }
+                                    return slot;
+                                });
+
+                                return {
+                                    ...dayObj,
+                                    slots: updatedSlots.flat(Infinity)
+                                };
+                            });
+
+
+                            setCalendar(updatedDaysArray);
+
+
+
                             return {
                                 ...dateObj,
                                 selectedSlots: [
@@ -196,6 +220,92 @@ const PhysioTable = () => {
                                 ],
                             };
                         } else {
+
+                            const updatedDaysArray = filteredData.map(dayObj => {
+                                const updatedSlots = dayObj.slots.map(slot => {
+
+
+                                    if (slot?.timestamp === selectedSlot.timestamp && dateObj?.date === date && dayObj?.day === day) {
+                                        // Matched timestamp, add the two values
+                                        if (anySelectedSlotsWithinNext75Minutes) {
+
+
+                                            const date1 = new Date(`2000-01-01 ${ans}`);
+                                            const date2 = new Date(`2000-01-01 ${selectedSlot.timestamp}`);
+
+                                            const differenceInMinutes = Math.abs((date2 - date1) / (1000 * 60));
+
+
+                                            // Add 45 minutes to date2
+                                            date2.setMinutes(date2.getMinutes() + 45);
+
+                                            // Subtract 15 minutes from date1
+                                            date1.setMinutes(date1.getMinutes() - 15);
+
+                                            const formatHour = (hour) => {
+                                                hour = hour % 12 || 12; // Ensure 12-hour format
+                                                return hour.toString().padStart(2, '0');
+                                            };
+
+                                            const resultTimestamp1 = `${formatHour(date1.getHours())}:${String(date1.getMinutes()).padStart(2, '0')} ${date1.getHours() >= 12 ? 'PM' : 'AM'}`;
+                                            const resultTimestamp2 = `${formatHour(date2.getHours())}:${String(date2.getMinutes()).padStart(2, '0')} ${date2.getHours() >= 12 ? 'PM' : 'AM'}`;
+
+
+
+                                            if (differenceInMinutes > 60) {
+                                                // If the difference is more than 1 hour, do something
+                                                const isUnique = dayObj.slots.some(slot => slot?.timestamp === resultTimestamp1);
+                                                console.log(isUnique)
+                                                if (isUnique) {
+                                                    return [
+                                                        slot
+                                                    ]
+                                                } else {
+                                                    return [
+                                                        slot,
+                                                        { timestamp: resultTimestamp2 },
+                                                        { timestamp: resultTimestamp1 }
+                                                    ]
+                                                }
+
+                                            } else if (differenceInMinutes === 60) {
+                                                // If the difference is exactly 1 hour, do something else
+                                                const isUnique = dayObj.slots.some(slot => slot?.timestamp === resultTimestamp2);
+                                                if (isUnique) {
+                                                    return [
+                                                        slot
+                                                    ]
+                                                } else {
+                                                    return [
+                                                        slot,
+                                                        { timestamp: resultTimestamp2 }
+
+                                                    ]
+                                                }
+
+
+                                            }
+
+                                        } else {
+                                            return [
+                                                slot
+                                            ]
+                                        }
+
+                                    }
+                                    return slot;
+                                });
+
+                                return {
+                                    ...dayObj,
+                                    slots: updatedSlots.flat(Infinity)
+                                };
+                            });
+
+
+                            setCalendar(updatedDaysArray);
+
+
                             // SelectedSlot doesn't exist, add it
                             return { ...dateObj, selectedSlots: [...existingSlots, selectedSlot] };
                         }
@@ -207,29 +317,6 @@ const PhysioTable = () => {
                 return [...prevDates, { day, date, selectedSlots: [selectedSlot] }];
             }
         });
-
-
-
-
-        const selectedTim = new Date(`2022-01-30 ${selectedSlot.timestamp}`).getTime();
-        const prev30Minutes = selectedTim - 30 * 60 * 1000;
-        const next30Minutes = selectedTim + 30 * 60 * 1000;
-
-        setSelectedDates((selectedDates) =>
-            selectedDates.map((dayData) => {
-                return {
-                    ...dayData,
-                    selectedSlots: dayData.selectedSlots.filter((slot) => {
-                        const slotTime = new Date(`2022-01-30 ${slot.timestamp}`).getTime();
-
-                        if (slotTime === selectedTim && day === dayData.day && date === dayData.date) {
-                            return true;
-                        }
-                        return !(slotTime >= prev30Minutes && slotTime <= next30Minutes && dayData.day === day && dayData.date === date);
-                    }),
-                };
-            })
-        );
 
     }
 
@@ -336,10 +423,11 @@ const PhysioTable = () => {
                             <li>{item?.date}</li>
                         </ul>
                         {item.slots.map((element, idx) => {
+
                             const isSelected = selectedDates.find(
                                 (date) => date.date === item.date
                             )?.selectedSlots?.some(
-                                (slot) => slot.timestamp === element.timestamp
+                                (slot) => slot?.timestamp === element?.timestamp
                             );
 
                             return (
@@ -352,7 +440,7 @@ const PhysioTable = () => {
                                             : 'bg-[#FFFFFF80] ' // Default color
                                         }`}
                                 >
-                                    {element.timestamp}
+                                    {element?.timestamp}
                                 </span>
                             );
                         })}
@@ -371,5 +459,3 @@ const PhysioTable = () => {
 };
 
 export default PhysioTable;
-
-
