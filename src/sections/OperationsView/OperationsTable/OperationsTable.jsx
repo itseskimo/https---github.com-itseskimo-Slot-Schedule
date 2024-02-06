@@ -183,7 +183,7 @@ const OperationsTable = () => {
 
     const generateTimeSlots = () => {
         const startTime = new Date('2024-01-01T09:00:00');
-        const endTime = new Date('2024-01-01T20:00:00');
+        const endTime = new Date('2024-01-01T18:00:00');
         const timeSlots = [];
 
         let currentTime = new Date(startTime);
