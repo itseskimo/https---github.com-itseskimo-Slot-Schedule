@@ -28,8 +28,31 @@ const PhysioTable = () => {
 
 
     useEffect(() => {
-        setSelectedDates((bookedSlots && bookedSlots[0]?.calendars) ?? []);
+
+        
+        if (bookedSlots && bookedSlots[0]?.calendars?.length) {
+            setSelectedDates((bookedSlots && bookedSlots[0]?.calendars) ?? []);
+
+
+            function removeNonSelectedSlots(calendar, selectedDates) {
+                // Iterate over calendar
+                calendar.forEach(calendarDay => {
+                    // Find corresponding selectedDates entry
+                    const selectedDay = selectedDates.find(day => day.date === calendarDay.date);
+                    if (selectedDay) {
+                        // Filter slots in calendar day that are not present in selectedDates
+                        calendarDay.slots = calendarDay.slots.filter(calendarSlot =>
+                            selectedDay.selectedSlots.some(selectedSlot => selectedSlot.timestamp === calendarSlot.timestamp)
+                        );
+                    }
+                });
+            }
+            removeNonSelectedSlots(calendar, selectedDates)
+        } 
+
     }, [bookedSlots]);
+
+
 
 
 
@@ -46,6 +69,15 @@ const PhysioTable = () => {
         const physioData = selectedDates;
         dispatch(addPhysioCalendar({ physioData, token }));
     }
+
+    console.log(calendar, 'calendar')
+    console.log(selectedDates, 'selectedDates')
+
+
+
+
+
+
 
 
 
@@ -394,7 +426,7 @@ const PhysioTable = () => {
             calendarController = calendarController.filter((_, index) => index >= currentDayIndex);
         }
 
-        // Now, calendarController contains the desired calendar information
+
 
         setCalendar(calendarController)
     }, [])
