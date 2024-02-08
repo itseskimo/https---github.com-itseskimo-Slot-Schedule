@@ -1,12 +1,20 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { setTimestamp } from '../../../redux/features/doctor/doctorSlice';
+import { setTimestamp, setSuccessReset, setSuccessMsg } from '../../../redux/features/doctor/doctorSlice';
+import { useEffect } from 'react';
+
 const PhysioDetails = () => {
     const dispatch = useDispatch();
 
-    const { doctorsList, removedSlots, timestamp, deletedOutput } = useSelector((state) => state.doctor);
+    const { doctorsList, removedSlots,successMsg, timestamp, deletedOutput, isPhysioSuccess } = useSelector((state) => state.doctor);
 
 
-
+    useEffect(() => {
+        if (isPhysioSuccess?.status === 200) {
+            alert('Slots Successfully Booked')
+            dispatch(setSuccessReset())
+            dispatch(setSuccessMsg(''))
+        }
+    }, [isPhysioSuccess]);
 
 
     return (
@@ -29,22 +37,22 @@ const PhysioDetails = () => {
                             <li className='font-semibold '>{item.days}</li>
                             <li>{item.dates}</li>
                             {item.slots?.map((slot, i) => (
-                            <li
-                                style={{ background: timestamp?.timestamp === slot.timestamp && timestamp?.date === slot.date && 'linear-gradient(90deg, rgba(6,15,23,1) 0%, rgba(4,65,78,1) 24%, rgba(3,86,101,1) 46%, rgba(2,109,126,1) 56%, rgba(144,238,144,1) 100%)' }}
-                                key={i}
-                                onClick={() => dispatch(setTimestamp(slot))}
-                                className={`px-8 h-max py-2 whitespace-nowrap list-none rounded-md text-center relative ${timestamp?.timestamp === slot.timestamp ? 'bg-gradient' : 'bg-transparent'} shadow-sm shadow-green-400 cursor-pointer`}
-                            >
-                                {slot.timestamp}
-                            </li>
-                            
-                        ))}
+                                <li
+                                    style={{ background: timestamp?.timestamp === slot.timestamp && timestamp?.date === slot.date && 'linear-gradient(90deg, rgba(6,15,23,1) 0%, rgba(4,65,78,1) 24%, rgba(3,86,101,1) 46%, rgba(2,109,126,1) 56%, rgba(144,238,144,1) 100%)' }}
+                                    key={i}
+                                    onClick={() => dispatch(setTimestamp(slot))}
+                                    className={`px-8 h-max py-2 whitespace-nowrap list-none rounded-md text-center relative ${timestamp?.timestamp === slot.timestamp ? 'bg-gradient' : 'bg-transparent'} shadow-sm shadow-green-400 cursor-pointer`}
+                                >
+                                    {slot.timestamp}
+                                </li>
+
+                            ))}
                         </ul>
-                        
+
                     </div>
                 ))}
 
-
+                {successMsg && <span>{successMsg}</span>}
                 {/* {deletedOutput?.slice().sort((a, b) => {
 
                     const timeA = new Date(`2022-01-30 ${a.timestamp}`);

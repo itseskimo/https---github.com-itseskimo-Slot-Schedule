@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessReset, setRemovedSlots, convertToDesiredFormat } from '../../../redux/features/doctor/doctorSlice';
+import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessReset,setSuccessMsg, setRemovedSlots, convertToDesiredFormat } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -56,16 +56,20 @@ const PhysioTable = () => {
 
 
 
-    useEffect(() => {
-        if (isPhysioSuccess?.status === 200) {
-            alert('Slots Successfully Booked')
-            dispatch(setSuccessReset())
-        }
-    }, [isPhysioSuccess]);
+    // useEffect(() => {
+    //     if (isPhysioSuccess?.status === 200) {
+    //         alert('Slots Successfully Booked')
+    //         dispatch(setSuccessReset())
+    //         setSuccessMsg('')
+    //     }else{
+    //         setSuccessMsg('Please Wait while the Slots are being updated')
+    //     }
+    // }, [isPhysioSuccess]);
 
 
 
     function handleSubmit() {
+        dispatch(setSuccessMsg('Please Wait while the Slots are being updated...'))  
         const physioData = selectedDates;
         dispatch(addPhysioCalendar({ physioData, token }));
     }

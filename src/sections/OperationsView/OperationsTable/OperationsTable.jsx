@@ -9,6 +9,7 @@ const OperationsTable = () => {
     const dispatch = useDispatch();
     const { doctorsList, availableDoctors, selectedDoctor, selectedRemarks } = useSelector((state) => state.doctor);
     const [clientId, setClientId] = useState('');
+    const [active, setActive] = useState('');
     const [operationSlots, setOperationSlots] = useState([]);
     const navigate = useNavigate();
     const [calendar, setCalendar] = useState([]);
@@ -323,7 +324,9 @@ const OperationsTable = () => {
                                     <span
                                         key={idx}
                                         onClick={() => handleUpdateSlot(selectedUser)}
-                                        className={`px-8 py-2 overflow-hidden whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
+                                        style={{ background: availableDoctors?.timestamp === element.timestamp &&  'linear-gradient(90deg, rgba(6,15,23,1) 0%, rgba(4,65,78,1) 48%, rgba(2,109,126,1) 76%, rgba(1,127,146,1) 100%, rgba(0,172,193,1) 100%, rgba(0,172,193,1) 100%, rgba(0,172,193,1) 100%)' }}
+
+                                        className={`px-8 py-2 ${availableDoctors.timestamp === element.timestamp && 'shadow-sm shadow-[#00acc1]'} overflow-hidden whitespace-nowrap rounded-md text-center relative ${currentDayIndex === 0 ? 'cursor-pointer' : 'cursor-not-allowed'
                                             } ${activeBooked?.assignedDoctor
                                                 ? 'bg-[#00acc1]' // Add your color for matching slots
                                                 : 'bg-[#FFFFFF80]' // Default color

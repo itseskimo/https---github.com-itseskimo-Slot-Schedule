@@ -135,11 +135,16 @@ const doctorSlice = createSlice({
         timestamp: [],
         deletedOutput: [],
         isOperationSuccess:null,
-        operationArray:[]
+        operationArray:[],
+        successMsg:''
     },
 
     reducers: {
 
+        setSuccessMsg(state, action) {
+            state.successMsg = action.payload;
+           
+        },
         setResetOperationSuccess(state, action) {
             state.isOperationSuccess = null;
            
@@ -346,4 +351,4 @@ const doctorSlice = createSlice({
 });
 
 export default doctorSlice.reducer;
-export const { setRole, setDoctorsAvailable, setLogout, setError, setTimestamp,setResetOperationSuccess, convertToDesiredFormat, setRemovedSlots, setSuccessReset, setSelectedDoctor, setRemarks, setDoctorsAppointment } = doctorSlice.actions;
+export const { setRole, setDoctorsAvailable, setLogout,setSuccessMsg, setError, setTimestamp,setResetOperationSuccess, convertToDesiredFormat, setRemovedSlots, setSuccessReset, setSelectedDoctor, setRemarks, setDoctorsAppointment } = doctorSlice.actions;
