@@ -169,6 +169,7 @@ const OperationsTable = () => {
 
 
         const updatedOriginalData = transformScheduleArrayToOriginalData(doctorsList, updatedDoctorList, doctorsList[0]?.userId);
+     console.log(updatedOriginalData)
         dispatch(updateOperationsCalendar(updatedOriginalData));
         setOperationSlots(updatedDoctorList);
         dispatch(setSelectedDoctor(''))
