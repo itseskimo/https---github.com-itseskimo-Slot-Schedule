@@ -16,51 +16,45 @@ const OperationsTable = () => {
 
 
 
-    const transformScheduleArrayToOriginalData = (doctorList, scheduleArray, userId) => {
-        const updatedUserData = doctorList.map(user => {
-            if (user.userId === userId) {
-                const updatedCalendars = user.calendars.map(calendar => {
-                    const matchingSchedules = scheduleArray.filter(schedule =>
-                        calendar.day === schedule.day && calendar.date === schedule.date
-                    );
-
-                    if (matchingSchedules.length > 0) {
-                        const updatedSlots = calendar.selectedSlots.map(slot => {
-                            const matchingSchedule = matchingSchedules.find(schedule =>
-                                slot.timestamp === schedule.timestamp
-                            );
-
-                            if (matchingSchedule) {
-                                const userEntry = {
-                                    timestamp: matchingSchedule.timestamp,
-                                    period: slot.period,
-                                    assignedDoctor: matchingSchedule.assignedDoctor,
-                                    users: matchingSchedule.users.map(user =>
-                                        user.userId === userId ? { userId: user.userId, remarks: user.remarks } : user
-                                    )
-                                };
-
-                                return userEntry;
-                            }
-
-                            return slot;
-                        });
-
-                        return { ...calendar, selectedSlots: updatedSlots };
-                    }
-
-                    return calendar;
-                });
-
-                return { ...user, calendars: updatedCalendars };
-            }
-
-            return user;
+    const transformScheduleArrayToOriginalData = (doctorList, scheduleArray) => {
+        return doctorList.map(user => {
+            const updatedCalendars = user.calendars.map(calendar => {
+                const matchingSchedules = scheduleArray.filter(schedule =>
+                    calendar.day === schedule.day && calendar.date === schedule.date
+                );
+    
+                if (matchingSchedules.length > 0) {
+                    const updatedSlots = calendar.selectedSlots.map(slot => {
+                        const matchingSchedule = matchingSchedules.find(schedule =>
+                            slot.timestamp === schedule.timestamp
+                        );
+    
+                        if (matchingSchedule) {
+                            const userEntry = {
+                                timestamp: matchingSchedule.timestamp,
+                                period: slot.period,
+                                assignedDoctor: matchingSchedule.assignedDoctor,
+                                users: matchingSchedule.users.map(user =>
+                                    user.userId === user.userId ? { userId: user.userId, remarks: user.remarks } : user
+                                )
+                            };
+    
+                            return userEntry;
+                        }
+    
+                        return slot;
+                    });
+    
+                    return { ...calendar, selectedSlots: updatedSlots };
+                }
+    
+                return calendar;
+            });
+    
+            return { ...user, calendars: updatedCalendars };
         });
-
-        return updatedUserData;
     };
-
+    
 
     function mergeUserData(usersData) {
         const mergedData = [];
