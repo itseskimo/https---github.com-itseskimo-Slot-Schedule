@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessReset,setSuccessMsg, setRemovedSlots, convertToDesiredFormat } from '../../../redux/features/doctor/doctorSlice';
+import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessReset, setSuccessMsg, setRemovedSlots, convertToDesiredFormat } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,6 +13,8 @@ const PhysioTable = () => {
     const [clientId, setClientId] = useState('');
     const [token, setToken] = useState('');
 
+    // const currentDayIndex = new Date().getDay();
+    const currentDayIndex = 0;
 
     useEffect(() => {
         if (localStorage.getItem("userInfo")) {
@@ -24,66 +26,87 @@ const PhysioTable = () => {
                 dispatch(getPhysioCalendar({ token: loginData.token }))
             }
         }
+
+        const getFormattedDate = (offset) => {
+            const today = new Date();
+            const targetDate = new Date(today);
+            targetDate.setDate(today.getDate() + offset);
+
+            const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(targetDate);
+            const date = targetDate.getDate();
+
+            return `${month} ${date}`;
+        };
+
+        let calendarController = [
+            { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
+            { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
+            { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
+            { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
+            { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
+            { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
+            { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
+        ];
+
+        // Include the entire week starting from Monday if it's Sunday
+        if (currentDayIndex === 0) {
+            calendarController = [
+                { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
+                { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
+                { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
+                { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
+                { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
+                { day: 'Saturday', date: getFormattedDate(7), slots: generateTimeSlots() }
+            ]
+        } else {
+            // Filter days before the current day
+            calendarController = calendarController.filter((_, index) => index >= currentDayIndex);
+        }
+
+        setCalendar(calendarController)
+
     }, []);
+
+
+    function removeNonSelectedSlots(calendar, selectedDates) {
+        const newCalendar = [];
+
+        calendar.forEach(calendarDay => {
+            const newCalendarDay = { ...calendarDay }; // Copy the calendar day
+            const selectedDay = selectedDates.find(day => day.date === calendarDay.date);
+
+            if (selectedDay) {
+                newCalendarDay.slots = calendarDay.slots.filter(calendarSlot =>
+                    selectedDay.selectedSlots.some(selectedSlot => selectedSlot.timestamp === calendarSlot.timestamp)
+                );
+            }
+
+            newCalendar.push(newCalendarDay); // Push the modified calendar day into the new array
+        });
+
+        return newCalendar;
+    }
 
 
     useEffect(() => {
 
-        
         if (bookedSlots && bookedSlots[0]?.calendars?.length) {
             setSelectedDates((bookedSlots && bookedSlots[0]?.calendars) ?? []);
 
-
-            function removeNonSelectedSlots(calendar, selectedDates) {
-                // Iterate over calendar
-                calendar.forEach(calendarDay => {
-                    // Find corresponding selectedDates entry
-                    const selectedDay = selectedDates.find(day => day.date === calendarDay.date);
-                    if (selectedDay) {
-                        // Filter slots in calendar day that are not present in selectedDates
-                        calendarDay.slots = calendarDay.slots.filter(calendarSlot =>
-                            selectedDay.selectedSlots.some(selectedSlot => selectedSlot.timestamp === calendarSlot.timestamp)
-                        );
-                    }
-                });
-            }
-            removeNonSelectedSlots(calendar, selectedDates)
-        } 
+            const newCalendar = removeNonSelectedSlots(calendar, selectedDates);
+            setCalendar(newCalendar)
+        }
 
     }, [bookedSlots]);
 
 
 
 
-
-    // useEffect(() => {
-    //     if (isPhysioSuccess?.status === 200) {
-    //         alert('Slots Successfully Booked')
-    //         dispatch(setSuccessReset())
-    //         setSuccessMsg('')
-    //     }else{
-    //         setSuccessMsg('Please Wait while the Slots are being updated')
-    //     }
-    // }, [isPhysioSuccess]);
-
-
-
     function handleSubmit() {
-        dispatch(setSuccessMsg('Please Wait while the Slots are being updated...'))  
+        dispatch(setSuccessMsg('Please Wait while the Slots are being updated...'))
         const physioData = selectedDates;
         dispatch(addPhysioCalendar({ physioData, token }));
     }
-
-    console.log(calendar, 'calendar')
-    console.log(selectedDates, 'selectedDates')
-
-
-
-
-
-
-
-
 
 
     function handleClick(day, date, selectedSlot) {
@@ -315,7 +338,6 @@ const PhysioTable = () => {
                                                     return [
                                                         slot,
                                                         { timestamp: resultTimestamp2 }
-
                                                     ]
                                                 }
 
@@ -341,7 +363,6 @@ const PhysioTable = () => {
 
                             setCalendar(updatedDaysArray);
 
-
                             // SelectedSlot doesn't exist, add it
                             return { ...dateObj, selectedSlots: [...existingSlots, selectedSlot] };
                         }
@@ -353,7 +374,6 @@ const PhysioTable = () => {
                 return [...prevDates, { day, date, selectedSlots: [selectedSlot] }];
             }
         });
-
     }
 
 
@@ -388,52 +408,6 @@ const PhysioTable = () => {
         return timeSlots;
     };
 
-
-    // const currentDayIndex = new Date().getDay();
-    const currentDayIndex = 0;
-
-    useEffect(() => {
-
-        const getFormattedDate = (offset) => {
-            const today = new Date();
-            const targetDate = new Date(today);
-            targetDate.setDate(today.getDate() + offset);
-
-            const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(targetDate);
-            const date = targetDate.getDate();
-
-            return `${month} ${date}`;
-        };
-
-        let calendarController = [
-            { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
-            { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
-            { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
-            { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
-            { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
-            { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
-            { day: 'Saturday', date: getFormattedDate(0), slots: generateTimeSlots() },
-        ];
-
-        // Include the entire week starting from Monday if it's Sunday
-        if (currentDayIndex === 0) {
-            calendarController = [
-                { day: 'Monday', date: getFormattedDate(2), slots: generateTimeSlots() },
-                { day: 'Tuesday', date: getFormattedDate(3), slots: generateTimeSlots() },
-                { day: 'Wednesday', date: getFormattedDate(4), slots: generateTimeSlots() },
-                { day: 'Thursday', date: getFormattedDate(5), slots: generateTimeSlots() },
-                { day: 'Friday', date: getFormattedDate(6), slots: generateTimeSlots() },
-                { day: 'Saturday', date: getFormattedDate(7), slots: generateTimeSlots() }
-            ]
-        } else {
-            // Filter days before the current day
-            calendarController = calendarController.filter((_, index) => index >= currentDayIndex);
-        }
-
-
-
-        setCalendar(calendarController)
-    }, [])
 
 
     function logOut() {
