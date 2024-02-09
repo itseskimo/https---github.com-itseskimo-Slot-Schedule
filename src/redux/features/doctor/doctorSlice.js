@@ -153,6 +153,7 @@ const doctorSlice = createSlice({
             state.userInfo = null;
             state.deletedOutput=[]
             state.removedSlots=[]
+            state.successMsg = null
         },
         setRole(state, action) {
             state.role = action.payload;

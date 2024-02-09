@@ -12,7 +12,7 @@ const PhysioDetails = () => {
         if (isPhysioSuccess?.status === 200) {
             alert('Slots Successfully Booked')
             dispatch(setSuccessReset())
-            dispatch(setSuccessMsg(''))
+            dispatch(setSuccessMsg(null))
         }
     }, [isPhysioSuccess]);
 
