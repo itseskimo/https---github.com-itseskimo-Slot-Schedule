@@ -74,57 +74,38 @@ const PhysioTable = () => {
 
 
 
-    // function removeDuplicates(calendar, selectedDates) {
-    //     // Iterate over calendar
-    //     calendar.forEach(calendarDay => {
-    //         // Find corresponding selectedDates entry
-    //         const selectedDay = selectedDates.find(day => day.date === calendarDay.date);
-    //         if (selectedDay) {
-    //             // Iterate over slots in calendar day
-    //             calendarDay.slots.forEach((slot, index) => {
-    //                 // Check if the timestamp exists in selectedDates
-    //                 const selectedSlotIndex = selectedDay.selectedSlots.findIndex(selectedSlot => selectedSlot.timestamp === slot.timestamp);
-    //                 if (selectedSlotIndex !== -1) {
-
-    //                     // If found, remove next two timestamps from both calendar and selectedDates
-    //                     const removedSlots = calendarDay.slots.splice(index + 1, 2);
-    //                     removedSlots.forEach(slot => {
-    //                         slot.date = calendarDay.date;
-    //                         slot.day = calendarDay.day;
-    //                     });
-
-    //                     dispatch(setRemovedSlots(removedSlots));
-
-    //                 }
-    //             });
-    //         }
-    //     });
-    //     return calendar
-    // }
-
-
-
     function removeDuplicates(calendar, selectedDates) {
-        const modifiedCalendar = calendar.map(calendarDay => {
+        // Iterate over calendar
+        calendar.forEach(calendarDay => {
+            // Find corresponding selectedDates entry
             const selectedDay = selectedDates.find(day => day.date === calendarDay.date);
             if (selectedDay) {
-                const newSlots = calendarDay.slots.filter((slot, index) => {
-                    const matchingSlotIndex = selectedDay.selectedSlots.findIndex(selectedSlot => selectedSlot.timestamp === slot.timestamp);
-                    if (matchingSlotIndex !== -1) {
-                        // If matching slot found, remove this and the next 2 slots
-                        return calendarDay.slots.splice(index + 1, 2);
+                // Iterate over slots in calendar day
+                calendarDay.slots.forEach((slot, index) => {
+                    // Check if the timestamp exists in selectedDates
+                    const selectedSlotIndex = selectedDay.selectedSlots.findIndex(selectedSlot => selectedSlot.timestamp === slot.timestamp);
+                    if (selectedSlotIndex !== -1) {
+
+                        // If found, remove next two timestamps from both calendar and selectedDates
+                        const removedSlots = calendarDay.slots.splice(index + 1, 2);
+                        removedSlots.forEach(slot => {
+                            slot.date = calendarDay.date;
+                            slot.day = calendarDay.day;
+                        });
+
+                        dispatch(setRemovedSlots(removedSlots));
+
                     }
-                    return true;
                 });
-                return { ...calendarDay, slots: newSlots };
-            } else {
-                return calendarDay;
             }
         });
-        return modifiedCalendar;
+        return calendar
     }
-    
 
+
+
+
+   
 
 
     useEffect(() => {
