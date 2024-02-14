@@ -13,7 +13,7 @@ const PhysioTable = () => {
     const [clientId, setClientId] = useState('');
     const [token, setToken] = useState('');
 
-    
+
 
     useEffect(() => {
         if (localStorage.getItem("userInfo")) {
@@ -32,8 +32,10 @@ const PhysioTable = () => {
 
 
     function removeDuplicates(calendar, selectedDates) {
+        if (selectedDates) setSelectedDates(selectedDates);
+
         return calendar.map(calendarDay => {
-            const selectedDay = selectedDates.find(day => day.date === calendarDay.date);
+            const selectedDay = selectedDates?.find(day => day.date === calendarDay.date);
             if (!selectedDay) return calendarDay;
 
             let modifiedSlots = [...calendarDay.slots];
@@ -61,22 +63,13 @@ const PhysioTable = () => {
     useEffect(() => {
 
         if (bookedSlots && bookedSlots[0]?.calendars?.length) {
-            setSelectedDates((bookedSlots && bookedSlots[0]?.calendars) ?? []);
 
-            // const newCalendar = removeDuplicates(calendar, selectedDates);
-            // setCalendar(newCalendar)
-        }
-
-    }, [bookedSlots]);
-    useEffect(() => {
-
-       
-
-            const newCalendar = removeDuplicates(calendar, selectedDates);
+            const newCalendar = removeDuplicates(calendar, bookedSlots && bookedSlots[0]?.calendars);
             setCalendar(newCalendar)
-        
-
+            console.log(newCalendar)
+        }
     }, [bookedSlots]);
+
 
 
 
@@ -457,7 +450,7 @@ const PhysioTable = () => {
                         </ul>
                         {item.slots.map((element, idx) => {
 
-                            const isSelected = selectedDates.find(
+                            const isSelected = selectedDates?.find(
                                 (date) => date.date === item.date
                             )?.selectedSlots?.some(
                                 (slot) => slot?.timestamp === element?.timestamp
