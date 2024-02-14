@@ -73,39 +73,31 @@ const PhysioTable = () => {
 
 
 
-
     function removeDuplicates(calendar, selectedDates) {
-        // Iterate over calendar
-        calendar.forEach(calendarDay => {
-            // Find corresponding selectedDates entry
+        return calendar.map(calendarDay => {
             const selectedDay = selectedDates.find(day => day.date === calendarDay.date);
-            if (selectedDay) {
-                // Iterate over slots in calendar day
-                calendarDay.slots.forEach((slot, index) => {
-                    // Check if the timestamp exists in selectedDates
-                    const selectedSlotIndex = selectedDay.selectedSlots.findIndex(selectedSlot => selectedSlot.timestamp === slot.timestamp);
-                    if (selectedSlotIndex !== -1) {
+            if (!selectedDay) return calendarDay;
 
-                        // If found, remove next two timestamps from both calendar and selectedDates
-                        const removedSlots = calendarDay.slots.splice(index + 1, 2);
-                        removedSlots.forEach(slot => {
-                            slot.date = calendarDay.date;
-                            slot.day = calendarDay.day;
-                        });
+            let modifiedSlots = [...calendarDay.slots];
 
-                        dispatch(setRemovedSlots(removedSlots));
+            selectedDay.selectedSlots.forEach(selectedSlot => {
+                const matchingIndex = modifiedSlots.findIndex(slot => slot.timestamp === selectedSlot.timestamp);
+                if (matchingIndex !== -1) {
+                    const removedSlots = modifiedSlots.splice(matchingIndex + 1, 2);
+                    removedSlots.forEach(slot => {
+                        slot.date = calendarDay.date;
+                        slot.day = calendarDay.day;
+                    });
+                    dispatch(setRemovedSlots(removedSlots));
 
-                    }
-                });
-            }
+                }
+            });
+
+            return { ...calendarDay, slots: modifiedSlots };
         });
-        return calendar
     }
 
 
-
-
-   
 
 
     useEffect(() => {
@@ -114,7 +106,7 @@ const PhysioTable = () => {
             setSelectedDates((bookedSlots && bookedSlots[0]?.calendars) ?? []);
 
             const newCalendar = removeDuplicates(calendar, selectedDates);
-            // setCalendar(newCalendar)
+            setCalendar(newCalendar)
             console.log(newCalendar)
         }
 
