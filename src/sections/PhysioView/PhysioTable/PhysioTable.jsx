@@ -138,12 +138,14 @@ const PhysioTable = () => {
         if (bookedSlots && bookedSlots[0]?.calendars?.length) {
             setSelectedDates((bookedSlots && bookedSlots[0]?.calendars) ?? []);
 
-            const newCalendar = removeDuplicates(calendar, selectedDates);
-            setCalendar(newCalendar)
-            console.log(newCalendar)
+            if (selectedDates) {
+                const newCalendar = removeDuplicates(calendar, selectedDates);
+                setCalendar(newCalendar)
+                console.log(newCalendar)
+            }
         }
 
-    }, [bookedSlots,calendar]);
+    }, [bookedSlots, calendar]);
 
 
 
