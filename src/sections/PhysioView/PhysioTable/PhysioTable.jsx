@@ -143,7 +143,7 @@ const PhysioTable = () => {
             console.log(newCalendar)
         }
 
-    }, [bookedSlots]);
+    }, [bookedSlots,calendar]);
 
 
 
