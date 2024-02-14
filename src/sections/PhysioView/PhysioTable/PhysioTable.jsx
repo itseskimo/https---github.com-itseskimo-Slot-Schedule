@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessReset, setSuccessMsg, setRemovedSlots, convertToDesiredFormat } from '../../../redux/features/doctor/doctorSlice';
+import { addPhysioCalendar, getPhysioCalendar, setLogout, setSuccessMsg, setRemovedSlots } from '../../../redux/features/doctor/doctorSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,7 +7,7 @@ const PhysioTable = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { bookedSlots, isPhysioSuccess, timestamp, removedSlots } = useSelector((state) => state.doctor);
+    const { bookedSlots, removedSlots } = useSelector((state) => state.doctor);
     const [selectedDates, setSelectedDates] = useState([]);
     const [calendar, setCalendar] = useState([]);
     const [clientId, setClientId] = useState('');
@@ -65,7 +65,6 @@ const PhysioTable = () => {
 
             const newCalendar = removeDuplicates(calendar, selectedDates);
             setCalendar(newCalendar)
-            console.log(newCalendar)
         }
 
     }, [bookedSlots]);
