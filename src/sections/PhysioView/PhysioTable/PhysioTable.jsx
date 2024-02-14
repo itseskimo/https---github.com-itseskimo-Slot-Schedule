@@ -63,9 +63,18 @@ const PhysioTable = () => {
         if (bookedSlots && bookedSlots[0]?.calendars?.length) {
             setSelectedDates((bookedSlots && bookedSlots[0]?.calendars) ?? []);
 
+            // const newCalendar = removeDuplicates(calendar, selectedDates);
+            // setCalendar(newCalendar)
+        }
+
+    }, [bookedSlots]);
+    useEffect(() => {
+
+       
+
             const newCalendar = removeDuplicates(calendar, selectedDates);
             setCalendar(newCalendar)
-        }
+        
 
     }, [bookedSlots]);
 
