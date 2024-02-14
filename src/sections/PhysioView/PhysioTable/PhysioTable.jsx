@@ -74,62 +74,56 @@ const PhysioTable = () => {
 
 
 
-
-
-    // function removeNonSelectedSlots(calendar, selectedDates) {
-    //     const newCalendar = [];
-
+    // function removeDuplicates(calendar, selectedDates) {
+    //     // Iterate over calendar
     //     calendar.forEach(calendarDay => {
-    //         const newCalendarDay = { ...calendarDay }; // Copy the calendar day
+    //         // Find corresponding selectedDates entry
     //         const selectedDay = selectedDates.find(day => day.date === calendarDay.date);
-
     //         if (selectedDay) {
-    //             newCalendarDay.slots = calendarDay.slots.filter(calendarSlot =>
-    //                 selectedDay.selectedSlots.some(selectedSlot => selectedSlot.timestamp === calendarSlot.timestamp)
-    //             );
+    //             // Iterate over slots in calendar day
+    //             calendarDay.slots.forEach((slot, index) => {
+    //                 // Check if the timestamp exists in selectedDates
+    //                 const selectedSlotIndex = selectedDay.selectedSlots.findIndex(selectedSlot => selectedSlot.timestamp === slot.timestamp);
+    //                 if (selectedSlotIndex !== -1) {
+
+    //                     // If found, remove next two timestamps from both calendar and selectedDates
+    //                     const removedSlots = calendarDay.slots.splice(index + 1, 2);
+    //                     removedSlots.forEach(slot => {
+    //                         slot.date = calendarDay.date;
+    //                         slot.day = calendarDay.day;
+    //                     });
+
+    //                     dispatch(setRemovedSlots(removedSlots));
+
+    //                 }
+    //             });
     //         }
-
-    //         newCalendar.push(newCalendarDay); // Push the modified calendar day into the new array
     //     });
-
-    //     return newCalendar;
+    //     return calendar
     // }
 
 
 
-
-
-
-
     function removeDuplicates(calendar, selectedDates) {
-        // Iterate over calendar
-        calendar.forEach(calendarDay => {
-            // Find corresponding selectedDates entry
+        const modifiedCalendar = calendar.map(calendarDay => {
             const selectedDay = selectedDates.find(day => day.date === calendarDay.date);
             if (selectedDay) {
-                // Iterate over slots in calendar day
-                calendarDay.slots.forEach((slot, index) => {
-                    // Check if the timestamp exists in selectedDates
-                    const selectedSlotIndex = selectedDay.selectedSlots.findIndex(selectedSlot => selectedSlot.timestamp === slot.timestamp);
-                    if (selectedSlotIndex !== -1) {
-
-                        // If found, remove next two timestamps from both calendar and selectedDates
-                        const removedSlots = calendarDay.slots.splice(index + 1, 2);
-                        removedSlots.forEach(slot => {
-                            slot.date = calendarDay.date;
-                            slot.day = calendarDay.day;
-                        });
-
-                        dispatch(setRemovedSlots(removedSlots));
-
+                const newSlots = calendarDay.slots.filter((slot, index) => {
+                    const matchingSlotIndex = selectedDay.selectedSlots.findIndex(selectedSlot => selectedSlot.timestamp === slot.timestamp);
+                    if (matchingSlotIndex !== -1) {
+                        // If matching slot found, remove this and the next 2 slots
+                        return calendarDay.slots.splice(index + 1, 2);
                     }
+                    return true;
                 });
+                return { ...calendarDay, slots: newSlots };
+            } else {
+                return calendarDay;
             }
         });
-        return calendar
+        return modifiedCalendar;
     }
-
-
+    
 
 
 
@@ -138,14 +132,12 @@ const PhysioTable = () => {
         if (bookedSlots && bookedSlots[0]?.calendars?.length) {
             setSelectedDates((bookedSlots && bookedSlots[0]?.calendars) ?? []);
 
-            if (selectedDates) {
-                const newCalendar = removeDuplicates(calendar, selectedDates);
-                setCalendar(newCalendar)
-                console.log(newCalendar)
-            }
+            const newCalendar = removeDuplicates(calendar, selectedDates);
+            // setCalendar(newCalendar)
+            console.log(newCalendar)
         }
 
-    }, [bookedSlots, calendar]);
+    }, [bookedSlots]);
 
 
 
