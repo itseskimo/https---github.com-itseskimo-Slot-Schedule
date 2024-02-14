@@ -114,20 +114,23 @@ const PhysioTable = () => {
                     if (selectedSlotIndex !== -1) {
 
                         // If found, remove next two timestamps from both calendar and selectedDates
-                        const removedSlots =  calendarDay.slots.splice(index + 1, 2);
+                        const removedSlots = calendarDay.slots.splice(index + 1, 2);
                         removedSlots.forEach(slot => {
                             slot.date = calendarDay.date;
                             slot.day = calendarDay.day;
                         });
-           
+
                         dispatch(setRemovedSlots(removedSlots));
 
                     }
                 });
             }
         });
-        return removedSlots
+        return calendar
     }
+
+
+
 
 
     useEffect(() => {
@@ -136,6 +139,7 @@ const PhysioTable = () => {
             setSelectedDates((bookedSlots && bookedSlots[0]?.calendars) ?? []);
 
             const newCalendar = removeDuplicates(calendar, selectedDates);
+            setCalendar(newCalendar)
             console.log(newCalendar)
         }
 
